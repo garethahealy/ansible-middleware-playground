@@ -1,0 +1,9 @@
+---
+all:
+  hosts:
+    {{ amq1_private_dns_name }}:
+      amq_broker_instance_name: one
+    {{ amq2_private_dns_name }}:
+      amq_broker_instance_name: two
+    {{ amq3_private_dns_name }}:
+      amq_broker_instance_name: three

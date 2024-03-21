@@ -1,5 +1,4 @@
 ---
-# vars file for create-vpc
 title: "Middleware Playground"
 vpc_name: "{{ title }} VPC"
 igw_name: "{{ title }} Igw"
@@ -14,7 +13,6 @@ zone: "eu-west-2a"
 
 instance_type: "t2.medium"
 instances:
-  - "bootstrap"
   - "amq1"
   - "amq2"
   - "amq3"

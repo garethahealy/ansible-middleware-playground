@@ -1,9 +1,0 @@
----
-all:
-  hosts:
-    ip-11-0-1-001.eu-west-2.compute.internal:
-      amq_broker_instance_name: one
-    ip-11-0-1-002.eu-west-2.compute.internal:
-      amq_broker_instance_name: two
-    ip-11-0-1-003.eu-west-2.compute.internal:
-      amq_broker_instance_name: three

@@ -1,8 +1,5 @@
 - hosts: localhost
   vars:
-    aws_access_key: "replace_me"
-    aws_secret_key: "replace_me"
-    my_ip: "replace_me"
     image_id: "ami-016bc0ffc60455bdf"
   roles:
     - name: "Creating VPC"
