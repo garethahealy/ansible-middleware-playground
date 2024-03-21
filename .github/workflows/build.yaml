@@ -1,0 +1,26 @@
+name: "Lint the roles"
+
+on: [ push, pull_request ]
+
+# Declare default permissions as read only.
+permissions: read-all
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+
+      - name: Copy ansible.cfg
+        run: |
+          sudo mkdir -p /etc/ansible
+          sudo cp configure-aws/configure_bootstrap/files/ansible.cfg /etc/ansible/ansible.cfg
+
+      - name: Install requirements
+        env:
+          ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN: ${{ secrets.ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN }}
+        run: ansible-galaxy install -r requirements.yml
+
+      - name: Run ansible-lint
+        uses: ansible/ansible-lint@ce2ebd7df4486adde693d7a70f0a9cd1814bce35 # v24

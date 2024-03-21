@@ -1,0 +1,10 @@
+- name: Configure bootstrap box
+  hosts: bootstrap
+  remote_user: ec2-user
+  vars:
+    ansible_ssh_private_key_file: configure_bootstrap/files/my_keypair.pem
+  environment:
+    ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN: "{{ ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN }}"
+  roles:
+    - name: "Configure bootstrap"
+      role: "configure_bootstrap"

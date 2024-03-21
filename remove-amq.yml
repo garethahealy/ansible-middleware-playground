@@ -1,0 +1,9 @@
+---
+- name: Remove any AMQ installations
+  hosts: all
+  tasks:
+    - name: Delete /opt/amq
+      become: true
+      ansible.builtin.file:
+        path: /opt/amq
+        state: absent

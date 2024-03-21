@@ -1,0 +1,170 @@
+---
+- name: Get my public IP
+  register: ip_output
+  community.general.ipify_facts:
+
+- name: Check image_id exists
+  amazon.aws.ec2_ami_info:
+    region: "{{ region }}"
+    image_ids: "{{ image_id }}"
+
+- name: Create VPC
+  amazon.aws.ec2_vpc_net:
+    region: "{{ region }}"
+    name: "{{ vpc_name }}"
+    cidr_block: "{{ vpc_cidr_block }}"
+    dns_support: true
+    dns_hostnames: true
+    tenancy: default
+    state: present
+  register: ec2_vpc_net_result
+
+- name: Create Internet Gateway for VPC
+  amazon.aws.ec2_vpc_igw:
+    region: "{{ region }}"
+    vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+    tags:
+      Name: "{{ igw_name }}"
+    state: present
+  register: igw_result
+
+- name: Create VPC Subnet
+  amazon.aws.ec2_vpc_subnet:
+    region: "{{ region }}"
+    vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+    az: "{{ zone }}"
+    cidr: "{{ subnet_cidr_block }}"
+    map_public: true
+    resource_tags:
+      Name: "{{ subnet_name }}"
+    state: present
+  register: subnet_result
+
+- name: Create VPC Public Subnet Route Table
+  amazon.aws.ec2_vpc_route_table:
+    region: "{{ region }}"
+    vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+    tags:
+      Name: "{{ route_table_name }}"
+    subnets:
+      - "{{ subnet_result.subnet.id }}"
+    routes:
+      - dest: "{{ destination_cidr_block }}"
+        gateway_id: "{{ igw_result.gateway_id }}"
+    state: present
+  register: public_route_table
+
+- name: Create Security Group
+  amazon.aws.ec2_security_group:
+    region: "{{ region }}"
+    vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+    name: "{{ security_group_name }}"
+    description: "{{ security_group_name }}"
+    tags:
+      Name: "{{ security_group_name }}"
+    rules:
+      - proto: tcp
+        from_port: 22
+        to_port: 22
+        rule_desc: allow SSH traffic from my laptop
+        cidr_ip: "{{ ip_output.ansible_facts.ipify_public_ip }}/32"
+      - proto: tcp
+        from_port: 8161
+        to_port: 8161
+        rule_desc: allow AMQ Console traffic from my laptop
+        cidr_ip: "{{ ip_output.ansible_facts.ipify_public_ip }}/32"
+      - proto: tcp
+        from_port: 22
+        to_port: 22
+        rule_desc: allow SSH traffic within VPC
+        cidr_ip: "{{ subnet_cidr_block }}"
+      - proto: tcp
+        from_port: 8161
+        to_port: 8161
+        rule_desc: allow AMQ Console traffic within VPC
+        cidr_ip: "{{ subnet_cidr_block }}"
+      - proto: tcp
+        from_port: 61616
+        to_port: 61616
+        rule_desc: allow AMQ traffic within VPC
+        cidr_ip: "{{ subnet_cidr_block }}"
+    state: present
+  register: security_group_results
+
+- name: Create a new EC2 key pair
+  amazon.aws.ec2_key:
+    region: "{{ region }}"
+    name: my_keypair
+    file_name: configure_bootstrap/files/my_keypair.pem
+    state: present
+
+- name: Provision bootstrap instance
+  amazon.aws.ec2_instance:
+    region: "{{ region }}"
+    name: "bootstrap"
+    image_id: "{{ image_id }}"
+    instance_type: "{{ instance_type }}"
+    key_name: "my_keypair"
+    vpc_subnet_id: "{{ subnet_result.subnet.id }}"
+    network:
+      assign_public_ip: true
+    security_group: "{{ security_group_results.group_id }}"
+    wait: true
+    state: started
+
+- name: Provision AMQ instances
+  amazon.aws.ec2_instance:
+    region: "{{ region }}"
+    name: "{{ item }}"
+    image_id: "{{ image_id }}"
+    instance_type: "{{ instance_type }}"
+    key_name: "my_keypair"
+    vpc_subnet_id: "{{ subnet_result.subnet.id }}"
+    network:
+      assign_public_ip: true
+    security_group: "{{ security_group_results.group_id }}"
+    wait: true
+    state: running
+  loop: "{{ instances }}"
+
+- name: Get bootstrap node info
+  amazon.aws.ec2_instance_info:
+    region: "{{ region }}"
+    filters:
+      instance-state-name: ["running"]
+      "tag:Name": "bootstrap"
+  register: bootstrap_node
+
+- name: Set bootstrap public_dns_name
+  ansible.builtin.set_fact:
+    bootstrap_public_dns_name: "{{ item.network_interfaces[0].association.public_dns_name }}"
+  loop: "{{ bootstrap_node.instances }}"
+
+- name: Get AMQ nodes info
+  amazon.aws.ec2_instance_info:
+    region: "{{ region }}"
+    filters:
+      instance-state-name: ["running"]
+      "tag:Name": "amq*"
+  register: amq_nodes
+
+- name: Create private_dns_names
+  ansible.builtin.set_fact:
+    private_dns_names: []
+
+- name: Set AMQ nodes private_dns_names
+  ansible.builtin.set_fact:
+    private_dns_names: "{{ private_dns_names + [{'name': item.tags.Name, 'dns': item.network_interfaces[0].private_dns_name}] }}"
+  loop: "{{ amq_nodes.instances }}"
+
+- name: Template inventory bootstrap.yml
+  ansible.builtin.template:
+    src: inventory/group_vars/bootstrap.j2
+    dest: inventory/group_vars/bootstrap.yml
+    mode: "0755"
+
+- name: Template inventory all.yml
+  ansible.builtin.template:
+    src: ../inventory/group_vars/all.j2
+    dest: ../inventory/group_vars/all.yml
+    mode: "0755"

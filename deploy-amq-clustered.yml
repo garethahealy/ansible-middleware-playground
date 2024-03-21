@@ -1,0 +1,48 @@
+---
+- name: Deploy AMQ in 3 broker clustered setup
+  hosts: all
+  vars:
+    ansible_ssh_private_key_file: my_keypair.pem
+    amq_broker_ha_enabled: true
+    amq_broker_nio_enabled: true
+    amq_broker_cors_strict_checking: false
+    amq_broker_prometheus_enabled: false
+    amq_broker_addresses:
+      - name: TEST
+        anycast:
+          - name: TEST
+      - name: DLQ
+        anycast:
+          - name: DLQ
+      - name: ExpiryQueue
+        anycast:
+          - name: ExpiryQueue
+    amq_broker_acceptors:
+      - name: artemis
+        bind_address: "0.0.0.0"
+        bind_port: "{{ amq_broker_port }}"
+        parameters:
+          tcpSendBufferSize: 1048576
+          tcpReceiveBufferSize: 1048576
+          amqpMinLargeMessageSize: 102400
+          protocols: CORE
+          useEpoll: true
+          amqpCredits: 1000
+          amqpLowCredits: 300
+          amqpDuplicateDetection: true
+          supportAdvisory: false
+          suppressInternalManagementObjects: false
+      - name: amqp
+        bind_address: "0.0.0.0"
+        bind_port: "{{ amq_broker_port_amqp }}"
+        parameters:
+          tcpSendBufferSize: 1048576
+          tcpReceiveBufferSize: 1048576
+          protocols: AMQP
+          useEpoll: true
+          amqpMinLargeMessageSize: 102400
+          amqpCredits: 1000
+          amqpLowCredits: 300
+          amqpDuplicateDetection: true
+  roles:
+    - redhat.amq_broker.amq_broker
