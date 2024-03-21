@@ -3,6 +3,11 @@
   register: ip_output
   community.general.ipify_facts:
 
+- name: Check image_id exists
+  amazon.aws.ec2_ami_info:
+    region: "{{ region }}"
+    image_ids: "{{ image_id }}"
+
 - name: Create VPC
   amazon.aws.ec2_vpc_net:
     region: "{{ region }}"
