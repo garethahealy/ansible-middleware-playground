@@ -1,0 +1,4 @@
+.idea/*
+
+configure-aws/amq-broker-7.11.6-bin.zip
+configure-aws/my_keypair.pem
