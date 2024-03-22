@@ -13,8 +13,8 @@
     region: "{{ region }}"
     name: "{{ vpc_name }}"
     cidr_block: "{{ vpc_cidr_block }}"
-    dns_support: yes
-    dns_hostnames: yes
+    dns_support: true
+    dns_hostnames: true
     tenancy: default
     state: present
   register: ec2_vpc_net_result
@@ -23,9 +23,9 @@
   amazon.aws.ec2_vpc_igw:
     region: "{{ region }}"
     vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
-    state: present
     tags:
       Name: "{{ igw_name }}"
+    state: present
   register: igw_result
 
 - name: Create VPC Subnet
@@ -33,35 +33,35 @@
     region: "{{ region }}"
     vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
     az: "{{ zone }}"
-    state: present
     cidr: "{{ subnet_cidr_block }}"
-    map_public: yes
+    map_public: true
     resource_tags:
       Name: "{{ subnet_name }}"
+    state: present
   register: subnet_result
 
 - name: Create VPC Public Subnet Route Table
   amazon.aws.ec2_vpc_route_table:
     region: "{{ region }}"
     vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
-    state: present
     tags:
       Name: "{{ route_table_name }}"
-    subnets: [ "{{ subnet_result.subnet.id }}" ]
+    subnets:
+      - "{{ subnet_result.subnet.id }}"
     routes:
       - dest: "{{ destination_cidr_block }}"
         gateway_id: "{{ igw_result.gateway_id }}"
+    state: present
   register: public_route_table
 
 - name: Create Security Group
   amazon.aws.ec2_security_group:
     region: "{{ region }}"
     vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
-    state: present
     name: "{{ security_group_name }}"
     description: "{{ security_group_name }}"
     tags:
-      Name: "{{ security_group_name  }}"
+      Name: "{{ security_group_name }}"
     rules:
       - proto: tcp
         from_port: 22
@@ -88,6 +88,7 @@
         to_port: 61616
         rule_desc: allow AMQ traffic within VPC
         cidr_ip: "{{ subnet_cidr_block }}"
+    state: present
   register: security_group_results
 
 - name: Create a new EC2 key pair, returns generated private key
@@ -109,7 +110,7 @@
     network:
       assign_public_ip: true
     security_group: "{{ security_group_results.group_id }}"
-    wait: yes
+    wait: true
     state: running
   register: bootstrap_node
 
@@ -124,12 +125,12 @@
     network:
       assign_public_ip: true
     security_group: "{{ security_group_results.group_id }}"
-    wait: yes
+    wait: true
     state: present
   loop: "{{ instances }}"
 
 - name: Set bootstrap public_dns_name
-  set_fact:
+  ansible.builtin.set_fact:
     bootstrap_public_dns_name: "{{ item['network_interfaces'][0].association.public_dns_name }}"
   loop: "{{ bootstrap_node['instances'] }}"
   loop_control:
@@ -139,6 +140,7 @@
   ansible.builtin.template:
     src: inventory/group_vars/bootstrap.j2
     dest: inventory/group_vars/bootstrap.yml
+    mode: "0755"
 
 - name: Get AMQ nodes one
   amazon.aws.ec2_instance_info:
@@ -162,21 +164,21 @@
   register: ec2_node3_info
 
 - name: Set AMQ1 public_dns_name
-  set_fact:
+  ansible.builtin.set_fact:
     amq1_private_dns_name: "{{ item['network_interfaces'][0].private_dns_name }}"
   loop: "{{ ec2_node1_info['instances'] }}"
   loop_control:
     label: "{{ item.network_interfaces }}"
 
 - name: Set AMQ2 public_dns_name
-  set_fact:
+  ansible.builtin.set_fact:
     amq2_private_dns_name: "{{ item['network_interfaces'][0].private_dns_name }}"
   loop: "{{ ec2_node2_info['instances'] }}"
   loop_control:
     label: "{{ item.network_interfaces }}"
 
 - name: Set AMQ3 public_dns_name
-  set_fact:
+  ansible.builtin.set_fact:
     amq3_private_dns_name: "{{ item['network_interfaces'][0].private_dns_name }}"
   loop: "{{ ec2_node3_info['instances'] }}"
   loop_control:
@@ -186,3 +188,4 @@
   ansible.builtin.template:
     src: ../inventory/group_vars/all.j2
     dest: ../inventory/group_vars/all.yml
+    mode: "0755"

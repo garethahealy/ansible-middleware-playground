@@ -3,4 +3,4 @@
     image_id: "ami-016bc0ffc60455bdf"
   roles:
     - name: "Creating VPC"
-      role: "create-vpc"
+      role: "create_vpc"

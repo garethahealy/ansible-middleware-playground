@@ -1,7 +1,7 @@
 .idea/*
 
 configure-aws/aws-keys.sh
-configure-aws/configure-bootstrap/files/*
+configure-aws/configure_bootstrap/files/*
 
 inventory/group_vars/all.yml
 configure-aws/inventory/group_vars/bootstrap.yml
