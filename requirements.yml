@@ -1,5 +1,7 @@
 ---
 collections:
   - community.general
+  - ansible.posix
   - amazon.aws
+  - community.aws
   - redhat.amq_broker

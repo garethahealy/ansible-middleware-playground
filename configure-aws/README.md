@@ -24,14 +24,20 @@ export ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN="replace_me"
 
 Check bootstrap is pingable
 ```bash
-ansible bootstrap --inventory inventory/group_vars/bootstrap.yml --module-name ansible.builtin.ping --user ec2-user --private-key configure_bootstrap/files/my_keypair.pem
+ansible bootstrap --inventory inventory/bootstrap.yml --module-name ansible.builtin.ping --user ec2-user --private-key configure_bootstrap/files/my_keypair.pem
 ```
 
 Update the `bootstrap` node with the required ansible bits
 ```bash
-ansible-playbook -i inventory/group_vars/bootstrap.yml configure-bootstrap.yml \
+ansible-playbook -i inventory/bootstrap.yml configure-bootstrap.yml \
   -e aws_access_key=${AWS_ACCESS_KEY_ID} \
   -e aws_secret_key=${AWS_SECRET_ACCESS_KEY} \
   -e ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN=${ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN}
 ```
 
+Configure the AMQ nodes with shared storage
+```bash
+ansible-playbook -i ../inventory/all.yml configure-amqnodes.yml \
+  -e aws_access_key=${AWS_ACCESS_KEY_ID} \
+  -e aws_secret_key=${AWS_SECRET_ACCESS_KEY}
+```

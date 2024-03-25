@@ -1,9 +1,8 @@
 .idea/*
 
-hub-token.sh
-rh-username-password.sh
-configure-aws/aws-keys.sh
+_creds.sh
 configure-aws/configure_bootstrap/files/my_keypair.pem
 
-inventory/group_vars/all.yml
-configure-aws/inventory/group_vars/bootstrap.yml
+inventory/all.yml
+inventory/amq1.yml
+configure-aws/inventory/bootstrap.yml

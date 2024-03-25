@@ -26,6 +26,15 @@
   when: ansible_output.rc != 0
   changed_when: ansible_output.rc != 0
 
+- name: Install extra packages
+  become: true
+  ansible.builtin.dnf:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - unzip
+    - java-11-openjdk-headless
+
 - name: Ensures /etc/ansible exists
   become: true
   ansible.builtin.file:
@@ -50,10 +59,15 @@
   ansible.builtin.pip:
     name: boto3
 
-- name: Install collection redhat.amq_broker
+- name: Install collections
   community.general.ansible_galaxy_install:
     type: collection
-    name: redhat.amq_broker
+    name: "{{ item }}"
+  loop:
+    - community.general
+    - amazon.aws
+    - community.aws
+    - redhat.amq_broker
 
 - name: Get AMQ nodes
   amazon.aws.ec2_instance_info:
@@ -86,23 +100,31 @@
     key: "{{ item.stdout }}"
   loop: "{{ ssh_scan.results }}"
 
-- name: Copy playground inventory
+- name: Copy inventory to bootstrap
   ansible.builtin.copy:
-    src: ../../../inventory
-    dest: /home/ec2-user/
+    src: "{{ playbook_dir }}/../inventory"
+    dest: /home/ec2-user
     mode: "0755"
 
-- name: Copy playground deploy-amq-clustered.yml
+- name: Copy configure-aws to bootstrap
   ansible.builtin.copy:
-    src: ../../deploy-amq-clustered.yml
-    dest: /home/ec2-user/
+    src: "{{ playbook_dir }}/../configure-aws"
+    dest: /home/ec2-user
     mode: "0755"
 
-- name: Copy playground remove-amq.yml
+- name: Copy files to bootstrap
   ansible.builtin.copy:
-    src: ../../remove-amq.yml
-    dest: /home/ec2-user/
+    src: "{{ item }}"
+    dest: /home/ec2-user
     mode: "0755"
+  with_fileglob:
+    - "{{ playbook_dir }}/../*.yml"
+    - "{{ playbook_dir }}/../*.j2"
+
+- name: Change file ownership for key
+  ansible.builtin.file:
+    path: /home/ec2-user/configure-aws/configure_bootstrap/files/my_keypair.pem
+    mode: "0400"
 
 - name: Get Bootstrap node
   amazon.aws.ec2_instance_info:
@@ -114,7 +136,7 @@
       "tag:Name": "bootstrap"
   register: ec2_bootstrap_node_info
 
-- name: SSH to boostrap
+- name: Print SSH to boostrap
   vars:
     key: "configure_bootstrap/files/my_keypair.pem"
     host: "{{ ec2_bootstrap_node_info.instances[0].network_interfaces[0].association.public_dns_name }}"

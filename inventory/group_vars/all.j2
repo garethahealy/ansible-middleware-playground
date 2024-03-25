@@ -1,7 +1,0 @@
----
-all:
-  hosts:
-  {% for node in private_dns_names %}
-  {{ node.dns }}:
-      amq_broker_instance_name: {{ node.name }}
-  {% endfor %}

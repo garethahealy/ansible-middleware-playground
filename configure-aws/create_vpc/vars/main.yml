@@ -5,9 +5,9 @@ igw_name: "{{ title }} Igw"
 subnet_name: "{{ title }} Subnet"
 route_table_name: "{{ title }} Route Table"
 security_group_name: "{{ title }} SG"
-vpc_cidr_block: '11.0.0.0/16'
-subnet_cidr_block: '11.0.1.0/24'
-destination_cidr_block: '0.0.0.0/0'
+vpc_cidr_block: "11.0.0.0/16"
+subnet_cidr_block: "11.0.1.0/24"
+destination_cidr_block: "0.0.0.0/0"
 region: "eu-west-2"
 zone: "eu-west-2a"
 

@@ -1,0 +1,9 @@
+---
+- name: Deploy AMQ single broker with custom broker.xml
+  hosts: single
+  vars:
+    ansible_ssh_private_key_file: my_keypair.pem
+    amq_broker_config_override_template: broker.xml.j2
+    amq_broker_cors_strict_checking: false
+  roles:
+    - redhat.amq_broker.amq_broker

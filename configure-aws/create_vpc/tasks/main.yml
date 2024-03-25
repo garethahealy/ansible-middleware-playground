@@ -88,6 +88,11 @@
         to_port: 61616
         rule_desc: allow AMQ traffic within VPC
         cidr_ip: "{{ subnet_cidr_block }}"
+      - proto: tcp
+        from_port: 2049
+        to_port: 2049
+        rule_desc: allow EFS traffic within VPC
+        cidr_ip: "{{ subnet_cidr_block }}"
     state: present
   register: security_group_results
 
@@ -96,6 +101,24 @@
     region: "{{ region }}"
     name: my_keypair
     file_name: configure_bootstrap/files/my_keypair.pem
+    force: true
+    state: present
+
+- name: Change file ownership for key
+  ansible.builtin.file:
+    path: configure_bootstrap/files/my_keypair.pem
+    mode: "0400"
+
+- name: Create EFS volume
+  community.aws.efs:
+    region: "{{ region }}"
+    name: amq-data
+    tags:
+      Name: amq-data
+    targets:
+      - subnet_id: "{{ subnet_result.subnet.id }}"
+        security_groups:
+          - "{{ security_group_results.group_id }}"
     state: present
 
 - name: Provision bootstrap instance
@@ -159,12 +182,18 @@
 
 - name: Template inventory bootstrap.yml
   ansible.builtin.template:
-    src: inventory/group_vars/bootstrap.j2
-    dest: inventory/group_vars/bootstrap.yml
+    src: inventory/bootstrap.j2
+    dest: inventory/bootstrap.yml
     mode: "0755"
 
 - name: Template inventory all.yml
   ansible.builtin.template:
-    src: ../inventory/group_vars/all.j2
-    dest: ../inventory/group_vars/all.yml
+    src: ../inventory/all.j2
+    dest: ../inventory/all.yml
+    mode: "0755"
+
+- name: Template inventory amq1.yml
+  ansible.builtin.template:
+    src: ../inventory/amq1.j2
+    dest: ../inventory/amq1.yml
     mode: "0755"

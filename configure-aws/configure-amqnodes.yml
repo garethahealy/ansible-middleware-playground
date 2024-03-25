@@ -1,0 +1,7 @@
+- name: Configure AMQ nodes for shared storage
+  hosts: dual
+  vars:
+    ansible_ssh_private_key_file: configure_bootstrap/files/my_keypair.pem
+  roles:
+    - name: "Configure AMQ nodes"
+      role: "configure_amqnodes"

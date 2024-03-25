@@ -1,0 +1,50 @@
+---
+- name: Get EFS volume
+  delegate_to: localhost
+  community.aws.efs_info:
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    region: "{{ region }}"
+    tags:
+      Name: amq-data
+  register: efs_volume
+
+- name: Install extra packages
+  become: true
+  ansible.builtin.dnf:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - nfs-utils
+
+- name: Create amq-broker service group
+  become: true
+  ansible.builtin.group:
+    name: "amq-broker"
+    system: true
+
+- name: "Create amq-broker service user"
+  become: true
+  ansible.builtin.user:
+    name: "amq-broker"
+    group: "amq-broker"
+    home: "/home/activemq"
+    system: true
+
+- name: Ensure mount directory exists
+  become: true
+  ansible.builtin.file:
+    path: "/opt/amq-data"
+    owner: amq-broker
+    group: amq-broker
+    state: directory
+    mode: "0775"
+
+- name: Ensure EFS volume is mounted
+  become: true
+  ansible.posix.mount:
+    path: "/opt/amq-data"
+    src: "{{ efs_volume.efs[0].filesystem_address }}"
+    fstype: nfs4
+    opts: nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport
+    state: mounted
