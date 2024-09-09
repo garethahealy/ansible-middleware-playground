@@ -1,6 +1,7 @@
 - name: Create AWS infrastructure
   hosts: localhost
   vars:
+    # https://eu-west-2.console.aws.amazon.com/ec2/home?region=eu-west-2#AMICatalog:
     image_id: "ami-016bc0ffc60455bdf"
   roles:
     - name: "Creating VPC"
