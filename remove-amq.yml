@@ -3,26 +3,5 @@
   hosts: all
   vars:
     ansible_ssh_private_key_file: my_keypair.pem
-  tasks:
-    - name: Stop system.d services
-      become: true
-      throttle: 1
-      ansible.builtin.systemd:
-        name: "{{ item }}"
-        state: stopped
-      ignore_errors: true
-      loop:
-        - amq1
-        - amq2
-        - amq3
-      register: systemd_output
-
-    - name: Delete files
-      become: true
-      ansible.builtin.file:
-        path: "{{ item }}"
-        state: absent
-      loop:
-        - /etc/systemd/system/amq1.service
-        - /etc/systemd/system/amq1.d
-        - /opt/amq
+  roles:
+    - redhat.amq_broker.amq_broker_uninstall
