@@ -22,13 +22,20 @@ Check hosts are OK
 ansible all -i inventory/all.yml -m ansible.builtin.ping --user ec2-user --private-key ~/my_keypair.pem
 ```
 
-## Single Broker **NOT RELEASED IN DOWNSTREAM YET*
+## Single Broker
 
 Deploy single broker with a custom broker.xml
 ```bash
 ansible-playbook -i inventory/all.yml deploy-amq-custom.yml \
   -e rhn_username=${RHN_USERNAME} \
   -e rhn_password=${RHN_PASSWORD}
+```
+
+Test single broker configuration
+```bash
+ansible-playbook test-amq-custom.yml \
+  -e aws_access_key=${AWS_ACCESS_KEY_ID} \
+  -e aws_secret_key=${AWS_SECRET_ACCESS_KEY}
 ```
 
 ## Master/Slave Broker
