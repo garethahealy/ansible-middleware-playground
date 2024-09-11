@@ -3,7 +3,7 @@
   hosts: localhost
   vars:
     ansible_ssh_private_key_file: my_keypair.pem
-    artemis_bin: "amq-broker/apache-artemis-2.33.0.redhat-00010//bin/artemis"
+    artemis_bin: "amq-broker/apache-artemis-2.33.0.redhat-00010/bin/artemis"
   tasks:
     - name: Get AMQ nodes info
       amazon.aws.ec2_instance_info:
@@ -37,7 +37,7 @@
         mode: "0755"
 
     - name: Start producer on amq1
-      ansible.builtin.command: "{{ artemis_bin }} producer --user amq-broker --password amq-broker --url  tcp://{{ item.dns }}:61616"
+      ansible.builtin.command: "{{ artemis_bin }} producer --user amq-broker --password amq-broker --url tcp://{{ item.dns }}:61616"
       loop: "{{ private_dns_names | selectattr('name', 'equalto', 'amq1') }}"
       changed_when: false
 
@@ -50,6 +50,6 @@
         state: stopped
 
     - name: Start consumer on amq2
-      ansible.builtin.command: "{{ artemis_bin }} consumer --user amq-broker --password amq-broker --url  tcp://{{ item.dns }}:61616"
+      ansible.builtin.command: "{{ artemis_bin }} consumer --user amq-broker --password amq-broker --url tcp://{{ item.dns }}:61616"
       loop: "{{ private_dns_names | selectattr('name', 'equalto', 'amq2') }}"
       changed_when: false
