@@ -1,0 +1,67 @@
+---
+- name: Test AMQ custom installation
+  hosts: localhost
+  vars:
+    artemis_bin_glob: "{{ playbook_dir }}/../amq-broker/apache-artemis-*/bin/artemis"
+  tasks:
+    - name: Include collections defaults
+      ansible.builtin.include_vars: ~/.ansible/collections/ansible_collections/redhat/amq_broker/roles/amq_broker/defaults/main.yml
+
+    - name: Get AMQ nodes info
+      amazon.aws.ec2_instance_info:
+        region: "eu-west-2"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        filters:
+          instance-state-name: ["running"]
+          "tag:Name": "amq*"
+      register: amq_nodes
+
+    - name: Create private_dns_names
+      ansible.builtin.set_fact:
+        private_dns_names: []
+
+    - name: Set AMQ nodes private_dns_names
+      ansible.builtin.set_fact:
+        private_dns_names: "{{ private_dns_names + [{'name': item.tags.Name, 'dns': item.network_interfaces[0].private_dns_name}] }}"
+      loop: "{{ amq_nodes.instances }}"
+
+    - name: Ensures /home/ec2-user/amq-broker exists
+      ansible.builtin.file:
+        path: /home/ec2-user/amq-broker
+        mode: "0755"
+        state: directory
+
+    - name: Extract amq-broker-bin.zip
+      ansible.builtin.unarchive:
+        src: "../{{ amq_broker_archive }}"
+        dest: /home/ec2-user/amq-broker
+        mode: "0755"
+
+    - name: Set artemis_bin fact
+      ansible.builtin.set_fact:
+        artemis_bin: "{{ artemis_bin_glob | fileglob | first }}"
+
+    - name: Start consumer
+      ansible.builtin.command: "{{ artemis_bin }} consumer --user amq-broker --password amq-broker --message-count 200 --url tcp://{{ item.dns }}:61616"
+      poll: 0
+      async: 60
+      loop: "{{ private_dns_names | selectattr('name', 'equalto', 'amq1') }}"
+      changed_when: false
+      register: amq1_consumer
+
+    - name: Start producer
+      ansible.builtin.command: "{{ artemis_bin }} producer --user amq-broker --password amq-broker --message-count 600 --url tcp://{{ item.dns }}:61616"
+      loop: "{{ private_dns_names | selectattr('name', 'equalto', 'amq1') }}"
+      changed_when: false
+      register: amq1_producer
+
+    - name: Wait for consumers to end
+      ansible.builtin.async_status:
+        jid: "{{ item.results[0].ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 5
+      delay: 10
+      loop:
+        - "{{ amq1_consumer }}"

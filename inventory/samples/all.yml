@@ -1,0 +1,10 @@
+---
+all:
+  hosts:
+    ip-11-0-1-001.eu-west-2.compute.internal:
+      amq_broker_instance_name: amq1
+    ip-11-0-2-002.eu-west-2.compute.internal:
+      amq_broker_instance_name: amq2
+    ip-11-0-3-003.eu-west-2.compute.internal:
+      amq_broker_instance_name: amq3
+

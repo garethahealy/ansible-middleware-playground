@@ -9,4 +9,4 @@ profile: production
 exclude_paths:
   - .github/
   - .ansible-lint
-  - ansible-code-bot.yml
+  - inventory/samples/*.yml

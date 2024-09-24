@@ -1,0 +1,83 @@
+---
+- name: Deploy AMQ in master/slave setup
+  hosts: masterslave
+  vars:
+    # SSH key
+    ansible_ssh_private_key_file: my_keypair.pem
+    # AWS
+    region: "eu-west-2"
+    # Master/Slave Config
+    amq_broker_ha_enabled: true
+    amq_broker_shared_storage: true
+    amq_broker_shared_storage_path: /opt/amq-data
+    # HACK: Allows console
+    amq_broker_cors_strict_checking: false
+    # Basic config
+    amq_broker_addresses:
+      - name: TEST
+        anycast:
+          - name: TEST
+    amq_broker_acceptors:
+      - name: artemis
+        bind_address: "0.0.0.0"
+        bind_port: "{{ amq_broker_port }}"
+        parameters:
+          protocols: CORE
+      - name: amqp
+        bind_address: "0.0.0.0"
+        bind_port: "{{ amq_broker_port_amqp }}"
+        parameters:
+          protocols: AMQP
+
+  tasks:
+    - name: Install extra packages
+      become: true
+      ansible.builtin.dnf:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - nfs-utils
+
+    - name: Ensure mount directory exists
+      become: true
+      ansible.builtin.file:
+        path: "/opt/amq-data"
+        owner: root
+        group: root
+        state: directory
+        mode: "0777"
+
+    - name: Get EFS volume
+      delegate_to: localhost
+      community.aws.efs_info:
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        region: "{{ region }}"
+        tags:
+          Name: amq-data
+      register: efs_volume
+
+    - name: Ensure EFS volume is mounted
+      become: true
+      ansible.posix.mount:
+        path: "/opt/amq-data"
+        src: "{{ efs_volume.efs[0].filesystem_address }}"
+        fstype: nfs4
+        opts: nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport
+        state: mounted
+
+    - name: Deploy AMQ
+      block:
+        - name: Import redhat.amq_broker.amq_broker
+          ansible.builtin.import_role:
+            name: redhat.amq_broker.amq_broker
+
+      always:
+        - name: Ensure mount directory is owned by amq-broker
+          become: true
+          ansible.builtin.file:
+            path: "/opt/amq-data"
+            owner: amq-broker
+            group: amq-broker
+            state: directory
+            mode: "0777"

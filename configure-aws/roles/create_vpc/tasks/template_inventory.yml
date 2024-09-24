@@ -1,0 +1,89 @@
+---
+- name: Get bootstrap node info
+  amazon.aws.ec2_instance_info:
+    region: "{{ create_vpc_region }}"
+    filters:
+      instance-state-name: ["running"]
+      "tag:Name": "bootstrap"
+  register: bootstrap_node
+
+- name: Set bootstrap public_dns_name
+  ansible.builtin.set_fact:
+    bootstrap_public_dns_name: "{{ item.network_interfaces[0].association.public_dns_name }}"
+  loop: "{{ bootstrap_node.instances }}"
+
+- name: Get AMQ nodes info
+  amazon.aws.ec2_instance_info:
+    region: "{{ create_vpc_region }}"
+    filters:
+      instance-state-name: ["running"]
+      "tag:Name": "amq*"
+  register: amq_nodes
+
+- name: Create private_dns_names
+  ansible.builtin.set_fact:
+    private_dns_names_unsorted: []
+
+- name: Set AMQ nodes private_dns_names
+  ansible.builtin.set_fact:
+    private_dns_names_unsorted: "{{ private_dns_names_unsorted + [{'name': item.tags.Name, 'dns': item.network_interfaces[0].private_dns_name}] }}"
+  loop: "{{ amq_nodes.instances }}"
+
+- name: Sort private_dns_names
+  ansible.builtin.set_fact:
+    private_dns_names: "{{ private_dns_names_unsorted | sort(attribute='name') }}"
+
+- name: Template inventory bootstrap.yml
+  ansible.builtin.template:
+    src: templates/bootstrap.j2
+    dest: "{{ playbook_dir }}/inventory/bootstrap.yml"
+    mode: "0755"
+
+- name: Template inventory all.yml
+  ansible.builtin.template:
+    src: templates/all.j2
+    dest: "{{ playbook_dir }}/../inventory/all.yml"
+    mode: "0755"
+
+- name: Template inventory clustered.yml
+  ansible.builtin.template:
+    src: templates/clustered.j2
+    dest: "{{ playbook_dir }}/../inventory/clustered.yml"
+    mode: "0755"
+
+- name: Template inventory clustered.yml
+  ansible.builtin.template:
+    src: templates/clustered.j2
+    dest: "{{ playbook_dir }}/../inventory/clustered.yml"
+    mode: "0755"
+
+- name: Template inventory federated.yml
+  ansible.builtin.template:
+    src: templates/federated.j2
+    dest: "{{ playbook_dir }}/../inventory/federated.yml"
+    mode: "0755"
+
+- name: Template inventory master-slave.yml
+  ansible.builtin.template:
+    src: templates/master-slave.j2
+    dest: "{{ playbook_dir }}/../inventory/master-slave.yml"
+    mode: "0755"
+
+- name: Add bootstrap host to in-memory inventory
+  ansible.builtin.add_host:
+    hostname: "{{ bootstrap_public_dns_name }}"
+    groups:
+      - bootstrap
+
+- name: Scan for SSH host keys
+  ansible.builtin.shell: ssh-keyscan {{ bootstrap_public_dns_name }} 2>/dev/null
+  register: ssh_scan
+  changed_when: false
+
+- name: Update known_hosts
+  ansible.builtin.known_hosts:
+    name: "{{ bootstrap_public_dns_name }}"
+    key: "{{ ssh_scan.stdout }}"
+
+- name: Check bootstrap is pingable
+  ansible.builtin.ping:

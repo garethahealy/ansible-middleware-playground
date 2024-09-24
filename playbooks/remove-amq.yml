@@ -1,0 +1,39 @@
+---
+- name: Remove any AMQ installations
+  hosts: all
+  vars:
+    # SSH key
+    ansible_ssh_private_key_file: my_keypair.pem
+    # AWS
+    region: "eu-west-2"
+  roles:
+    - redhat.amq_broker.amq_broker_uninstall
+
+  post_tasks:
+    - name: Ensure /opt/amq-data/* is empty
+      become: true
+      ansible.builtin.shell: rm -rf /opt/amq-data/*
+      changed_when: false
+
+    - name: Get EFS volume
+      delegate_to: localhost
+      community.aws.efs_info:
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        region: "{{ region }}"
+        tags:
+          Name: amq-data
+      register: efs_volume
+
+    - name: Ensure EFS volume is absent
+      become: true
+      ansible.posix.mount:
+        path: "/opt/amq-data"
+        src: "{{ efs_volume.efs[0].filesystem_address }}"
+        state: absent
+
+    - name: Ensure mount directory doesnt exists
+      become: true
+      ansible.builtin.file:
+        path: "/opt/amq-data"
+        state: absent

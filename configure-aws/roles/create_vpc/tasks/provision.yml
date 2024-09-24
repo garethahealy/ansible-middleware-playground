@@ -1,0 +1,29 @@
+---
+- name: Provision bootstrap instance
+  amazon.aws.ec2_instance:
+    region: "{{ create_vpc_region }}"
+    name: "bootstrap"
+    image_id: "{{ create_vpc_image_id }}"
+    instance_type: "{{ create_vpc_instance_type }}"
+    key_name: "my_keypair"
+    vpc_subnet_id: "{{ subnet_result.subnet.id }}"
+    network_interfaces:
+      - assign_public_ip: true
+    security_group: "{{ security_group_results.group_id }}"
+    wait: true
+    state: started
+
+- name: Provision AMQ instances
+  amazon.aws.ec2_instance:
+    region: "{{ create_vpc_region }}"
+    name: "{{ item }}"
+    image_id: "{{ create_vpc_image_id }}"
+    instance_type: "{{ create_vpc_instance_type }}"
+    key_name: "my_keypair"
+    vpc_subnet_id: "{{ subnet_result.subnet.id }}"
+    network_interfaces:
+      - assign_public_ip: true
+    security_group: "{{ security_group_results.group_id }}"
+    wait: true
+    state: running
+  loop: "{{ create_vpc_instances }}"

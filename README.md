@@ -4,7 +4,14 @@ Examples using https://github.com/ansible-middleware/amq
 
 ## Setup
 
-Install the requirement roles
+If you don't have any infrastructure, see [README.md](configure-aws%2FREADME.md). If you do, create an inventory file like [samples](inventory/samples)
+
+Check hosts are OK (_run from bootstrap_)
+```bash
+ansible all -i inventory/all.yml -m ansible.builtin.ping --user ec2-user --private-key ~/my_keypair.pem
+```
+
+Install the required roles
 ```bash
 ansible-galaxy install -r requirements.yml
 ```
@@ -15,25 +22,24 @@ export RHN_USERNAME="replace_me"
 export RHN_PASSWORD="replace_me"
 ```
 
-If you don't have any infrastructure, see [README.md](configure-aws%2FREADME.md). If you do, create an inventory file like [sample.yml](inventory%2Fsample.yml))
-
-Check hosts are OK
+Set your AWS credentials
 ```bash
-ansible all -i inventory/all.yml -m ansible.builtin.ping --user ec2-user --private-key ~/my_keypair.pem
+export AWS_ACCESS_KEY_ID="replace_me"
+export AWS_SECRET_ACCESS_KEY="replace_me"
 ```
 
 ## Single Broker
 
 Deploy single broker with a custom broker.xml
 ```bash
-ansible-playbook -i inventory/master-slave.yml deploy-amq-custom.yml \
+ansible-playbook -i inventory/master-slave.yml playbooks/deploy-amq-custom.yml \
   -e rhn_username=${RHN_USERNAME} \
   -e rhn_password=${RHN_PASSWORD}
 ```
 
 Test single broker configuration
 ```bash
-ansible-playbook test-amq-custom.yml \
+ansible-playbook playbooks/test-amq-custom.yml \
   -e aws_access_key=${AWS_ACCESS_KEY_ID} \
   -e aws_secret_key=${AWS_SECRET_ACCESS_KEY}
 ```
@@ -42,14 +48,16 @@ ansible-playbook test-amq-custom.yml \
 
 Deploy master/slave broker, with shared storage
 ```bash
-ansible-playbook -i inventory/master-slave.yml deploy-amq-masterslave.yml \
+ansible-playbook -i inventory/master-slave.yml playbooks/deploy-amq-master-slave.yml \
   -e rhn_username=${RHN_USERNAME} \
-  -e rhn_password=${RHN_PASSWORD}
+  -e rhn_password=${RHN_PASSWORD} \
+  -e aws_access_key=${AWS_ACCESS_KEY_ID} \
+  -e aws_secret_key=${AWS_SECRET_ACCESS_KEY}
 ```
 
 Test master/slave broker configuration
 ```bash
-ansible-playbook -i inventory/master-slave.yml test-amq-masterslave.yml \
+ansible-playbook -i inventory/master-slave.yml playbooks/test-amq-master-slave.yml \
   -e aws_access_key=${AWS_ACCESS_KEY_ID} \
   -e aws_secret_key=${AWS_SECRET_ACCESS_KEY}
 ```
@@ -58,32 +66,30 @@ ansible-playbook -i inventory/master-slave.yml test-amq-masterslave.yml \
 
 Deploy clustered brokers
 ```bash
-ansible-playbook -i inventory/clustered.yml deploy-amq-clustered.yml \
+ansible-playbook -i inventory/clustered.yml playbooks/deploy-amq-clustered.yml \
   -e rhn_username=${RHN_USERNAME} \
   -e rhn_password=${RHN_PASSWORD}
 ```
 
 Test clustered brokers configuration
 ```bash
-ansible-playbook test-amq-clustered-source.yml \
+ansible-playbook playbooks/test-amq-clustered.yml \
   -e aws_access_key=${AWS_ACCESS_KEY_ID} \
   -e aws_secret_key=${AWS_SECRET_ACCESS_KEY}
 ```
 
 ## 3 Federated Brokers
 
-See [BUG](https://github.com/ansible-middleware/amq/issues/177)
-
 Deploy federated brokers
 ```bash
-ansible-playbook -i inventory/federated.yml deploy-amq-federated.yml \
+ansible-playbook -i inventory/federated.yml playbooks/deploy-amq-federated.yml \
   -e rhn_username=${RHN_USERNAME} \
   -e rhn_password=${RHN_PASSWORD}
 ```
 
 Test federated brokers configuration
 ```bash
-ansible-playbook test-amq-clustered.yml \
+ansible-playbook playbooks/test-amq-clustered.yml \
   -e aws_access_key=${AWS_ACCESS_KEY_ID} \
   -e aws_secret_key=${AWS_SECRET_ACCESS_KEY}
 ```
@@ -91,5 +97,7 @@ ansible-playbook test-amq-clustered.yml \
 ## Remove an installation
 
 ```bash
-ansible-playbook -i inventory/all.yml remove-amq.yml
+ansible-playbook -i inventory/all.yml playbooks/remove-amq.yml \
+  -e aws_access_key=${AWS_ACCESS_KEY_ID} \
+  -e aws_secret_key=${AWS_SECRET_ACCESS_KEY}
 ```

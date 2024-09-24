@@ -1,0 +1,15 @@
+---
+- name: Install linux packages
+  ansible.builtin.include_tasks: linux_packages.yml
+
+- name: Install ansible packages
+  ansible.builtin.include_tasks: ansible_packages.yml
+
+- name: Update known_hosts
+  ansible.builtin.include_tasks: update_ssh.yml
+
+- name: Copy inventory and playbooks to bootstrap
+  ansible.builtin.include_tasks: copy_files.yml
+
+- name: Print helper SSH command
+  ansible.builtin.include_tasks: print.yml

@@ -12,32 +12,15 @@ export AWS_ACCESS_KEY_ID="replace_me"
 export AWS_SECRET_ACCESS_KEY="replace_me"
 ```
 
-Deploy the AWS infrastructure
-```bash
-ansible-playbook deploy.yml
-```
-
 Get a Automation Hub token from https://console.redhat.com/ansible/automation-hub/token
 ```bash
 export ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN="replace_me"
 ```
 
-Check bootstrap is pingable
+Deploy the AWS infrastructure (_run from local_)
 ```bash
-ansible bootstrap --inventory inventory/bootstrap.yml --module-name ansible.builtin.ping --user ec2-user --private-key configure_bootstrap/files/my_keypair.pem
-```
-
-Update the `bootstrap` node with the required ansible bits
-```bash
-ansible-playbook -i inventory/bootstrap.yml configure-bootstrap.yml \
+ansible-playbook deploy.yml \
   -e aws_access_key=${AWS_ACCESS_KEY_ID} \
   -e aws_secret_key=${AWS_SECRET_ACCESS_KEY} \
   -e ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN=${ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN}
-```
-
-Configure the AMQ nodes with shared storage
-```bash
-ansible-playbook -i ../inventory/all.yml configure-amqnodes.yml \
-  -e aws_access_key=${AWS_ACCESS_KEY_ID} \
-  -e aws_secret_key=${AWS_SECRET_ACCESS_KEY}
 ```

@@ -20,7 +20,7 @@ jobs:
       - name: Copy ansible.cfg
         run: |
           sudo mkdir -p /etc/ansible
-          sudo cp configure-aws/configure_bootstrap/files/ansible.cfg /etc/ansible/ansible.cfg
+          sudo cp configure-aws/roles/configure_bootstrap/files/ansible.cfg /etc/ansible/ansible.cfg
 
       - name: Install requirements
         env:
@@ -34,7 +34,7 @@ jobs:
         shell: bash
         id: hash
         run: |
-          tar cvf ansible-middleware-playground.tar configure-aws/ inventory/ requirements.yml broker.xml.j2 deploy-amq-*.yml test-amq-*.yml remove-amq.yml
+          tar cvf ansible-middleware-playground.tar configure-aws/ inventory/ playbooks/ requirements.yml
           
           echo "hashes=$(sha256sum ansible-middleware-playground.tar | base64 -w0)" >> "$GITHUB_OUTPUT"
 

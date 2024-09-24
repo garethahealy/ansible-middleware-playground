@@ -5,3 +5,4 @@ collections:
   - name: amazon.aws
   - name: community.aws
   - name: redhat.amq_broker
+    version: "2.2.2"

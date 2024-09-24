@@ -1,0 +1,13 @@
+---
+- name: Create a new EC2 key pair
+  amazon.aws.ec2_key:
+    region: "{{ create_vpc_region }}"
+    name: my_keypair
+    file_name: "{{ playbook_dir }}/roles/configure_bootstrap/files/my_keypair.pem"
+    force: true
+    state: present
+
+- name: Change file ownership for key
+  ansible.builtin.file:
+    path: "{{ playbook_dir }}/roles/configure_bootstrap/files/my_keypair.pem"
+    mode: "0400"
