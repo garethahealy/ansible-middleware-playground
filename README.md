@@ -65,6 +65,24 @@ ansible-playbook -i inventory/all.yml deploy-amq-clustered.yml \
 
 Test clustered brokers configuration
 ```bash
+ansible-playbook test-amq-clustered-source.yml \
+  -e aws_access_key=${AWS_ACCESS_KEY_ID} \
+  -e aws_secret_key=${AWS_SECRET_ACCESS_KEY}
+```
+
+## 3 Federated Brokers
+
+See [BUG](https://github.com/ansible-middleware/amq/issues/TODO)
+
+Deploy federated brokers
+```bash
+ansible-playbook -i inventory/all.yml deploy-amq-federated.yml \
+  -e rhn_username=${RHN_USERNAME} \
+  -e rhn_password=${RHN_PASSWORD}
+```
+
+Test federated brokers configuration
+```bash
 ansible-playbook test-amq-clustered.yml \
   -e aws_access_key=${AWS_ACCESS_KEY_ID} \
   -e aws_secret_key=${AWS_SECRET_ACCESS_KEY}

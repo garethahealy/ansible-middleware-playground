@@ -5,6 +5,38 @@ all:
     {{ node.dns }}:
       amq_broker_instance_name: {{ node.name }}
 {% endfor %}
+
+clustered:
+  hosts:
+{% for node in private_dns_names %}
+    {{ node.dns }}:
+      amq_broker_instance_name: {{ node.name }}
+      amq_broker_cluster_connections:
+{% for cluster_node in private_dns_names %}
+{% if node.name != cluster_node.name %}
+      - name: {{ cluster_node.name }}
+        value: tcp://{{ node.dns }}:61616
+{% endif %}
+{% endfor %}
+      amq_broker_connectors:
+{% for broker_node in private_dns_names %}
+{% if node.name == broker_node.name %}
+      - name: artemis
+        scheme: tcp
+        address: {{ broker_node.dns }}
+        port: 61616
+{% endif %}
+{% endfor %}
+{% for broker_node in private_dns_names %}
+{% if node.name != broker_node.name %}
+      - name: {{ broker_node.name }}
+        scheme: tcp
+        address: {{ broker_node.dns }}
+        port: 61616
+{% endif %}
+{% endfor %}
+{% endfor %}
+
 single:
   hosts:
 {% for node in private_dns_names %}
@@ -13,6 +45,7 @@ single:
       amq_broker_instance_name: {{ node.name }}
 {% endif %}
 {% endfor %}
+
 dual:
   hosts:
 {% for node in private_dns_names %}
@@ -26,4 +59,45 @@ dual:
       amq_broker_instance_name: {{ node.name }}
       activemq_ha_role: {{ role }}
 {% endif %}
+{% endfor %}
+
+fed:
+  hosts:
+{% for node in private_dns_names %}
+    {{ node.dns }}:
+      amq_broker_instance_name: {{ node.name }}
+      amq_broker_connectors:
+{% for broker_node in private_dns_names %}
+{% if node.name == broker_node.name %}
+      - name: artemis
+        scheme: tcp
+        address: {{ broker_node.dns }}
+        port: 61616
+{% endif %}
+{% endfor %}
+{% for broker_node in private_dns_names %}
+{% if node.name != broker_node.name %}
+      - name: {{ broker_node.name }}
+        scheme: tcp
+        address: {{ broker_node.dns }}
+        port: 61616
+{% endif %}
+{% endfor %}
+      amq_broker_federations:
+        - name: {{ node.name }}-federation
+          upstreams:
+{% for fed_node in private_dns_names %}
+{% if node.name != fed_node.name %}
+            - name: {{ fed_node.name }}
+              user: amq-broker
+              password: amq-broker
+              static_connectors:
+                - {{ fed_node.name }}
+{% endif %}
+{% endfor %}
+          queue_policies:
+            - name: TEST
+              includes:
+                - queue_match: TEST
+                  address_match: TEST
 {% endfor %}
