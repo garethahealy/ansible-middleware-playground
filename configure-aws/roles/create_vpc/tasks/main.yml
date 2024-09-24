@@ -1,0 +1,38 @@
+---
+- name: Check ami exists
+  ansible.builtin.include_tasks: ami_exists.yml
+  tags:
+    - blank
+
+- name: Create VPC
+  ansible.builtin.include_tasks: vpc.yml
+
+- name: Create Security Group
+  ansible.builtin.include_tasks: security_group.yml
+
+- name: Create EFS
+  ansible.builtin.include_tasks: efs.yml
+  tags:
+    - blank
+
+- name: Create SSH key
+  ansible.builtin.include_tasks: ssh_key.yml
+  tags:
+    - blank
+
+- name: Decrypt SSH key
+  ansible.builtin.include_tasks: decrypt_ssh_key.yml
+
+- name: Provision hosts
+  ansible.builtin.include_tasks: provision.yml
+  tags:
+    - blank
+
+- name: Set DNS facts
+  ansible.builtin.include_tasks: set_dns_facts.yml
+
+- name: Create inventory files from templates
+  ansible.builtin.include_tasks: template_inventory.yml
+
+- name: Update local SSH config for bootstrap
+  ansible.builtin.include_tasks: ssh_bootstrap.yml

@@ -1,0 +1,20 @@
+---
+- name: Get AMQ nodes info
+  amazon.aws.ec2_instance_info:
+    region: "{{ test_amq_region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    filters:
+      instance-state-name: ["running"]
+      "tag:Name": "amq*"
+  register: amq_nodes
+
+- name: Create private_dns_names
+  ansible.builtin.set_fact:
+    private_dns_names: []
+
+- name: Set AMQ nodes private_dns_names
+  ansible.builtin.set_fact:
+    private_dns_names: "{{ private_dns_names + [{'name': item.tags.Name, 'dns': item.network_interfaces[0].private_dns_name}] }}"
+  loop: "{{ amq_nodes.instances }}"
+  no_log: true

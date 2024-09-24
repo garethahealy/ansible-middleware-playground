@@ -1,0 +1,54 @@
+---
+- name: Template inventory bootstrap.yml
+  ansible.builtin.template:
+    src: templates/bootstrap.j2
+    dest: "{{ playbook_dir }}/inventory/bootstrap.yml"
+    mode: "0755"
+
+- name: Template inventory all.yml
+  ansible.builtin.template:
+    src: templates/all.j2
+    dest: "{{ playbook_dir }}/../inventory/all.yml"
+    mode: "0755"
+  tags:
+    - blank
+
+- name: Template inventory clustered.yml
+  ansible.builtin.template:
+    src: templates/clustered.j2
+    dest: "{{ playbook_dir }}/../inventory/clustered.yml"
+    mode: "0755"
+  tags:
+    - blank
+
+- name: Template inventory custom.yml
+  ansible.builtin.template:
+    src: templates/custom.j2
+    dest: "{{ playbook_dir }}/../inventory/custom.yml"
+    mode: "0755"
+  tags:
+    - blank
+
+- name: Template inventory federated.yml
+  ansible.builtin.template:
+    src: templates/federated.j2
+    dest: "{{ playbook_dir }}/../inventory/federated.yml"
+    mode: "0755"
+  tags:
+    - blank
+
+- name: Template inventory master-slave.yml
+  ansible.builtin.template:
+    src: templates/master-slave.j2
+    dest: "{{ playbook_dir }}/../inventory/master-slave.yml"
+    mode: "0755"
+  tags:
+    - blank
+
+- name: Template inventory master-slave-test.yml
+  ansible.builtin.template:
+    src: templates/master-slave-test.j2
+    dest: "{{ playbook_dir }}/../inventory/master-slave-test.yml"
+    mode: "0755"
+  tags:
+    - blank

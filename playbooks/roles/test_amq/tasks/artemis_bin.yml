@@ -1,0 +1,19 @@
+---
+- name: Include collections defaults
+  ansible.builtin.include_vars: ~/.ansible/collections/ansible_collections/redhat/amq_broker/roles/amq_broker/defaults/main.yml
+
+- name: Ensure /home/ec2-user/amq-broker exists
+  ansible.builtin.file:
+    path: /home/ec2-user/amq-broker
+    mode: "0755"
+    state: directory
+
+- name: Extract amq-broker-bin.zip
+  ansible.builtin.unarchive:
+    src: "/home/ec2-user/{{ amq_broker_archive }}"
+    dest: /home/ec2-user/amq-broker
+    mode: "0755"
+
+- name: Set artemis_bin fact
+  ansible.builtin.set_fact:
+    artemis_bin: "{{ test_amq_artemis_bin_glob | fileglob | first }}"

@@ -1,0 +1,7 @@
+---
+all:
+  hosts:
+{% for node in private_dns_names %}
+    {{ node.name }}:
+      ansible_host: {{ node.dns }}
+{% endfor %}

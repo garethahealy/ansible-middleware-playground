@@ -1,0 +1,5 @@
+---
+- name: Check image_id exists
+  amazon.aws.ec2_ami_info:
+    region: "{{ create_vpc_region }}"
+    image_ids: "{{ create_vpc_image_id }}"

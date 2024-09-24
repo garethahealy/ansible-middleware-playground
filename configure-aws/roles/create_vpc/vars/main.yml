@@ -1,0 +1,20 @@
+---
+create_vpc_title: "Middleware Playground"
+create_vpc_vpc_name: "{{ create_vpc_title }} VPC"
+create_vpc_igw_name: "{{ create_vpc_title }} Igw"
+create_vpc_subnet_name: "{{ create_vpc_title }} Subnet"
+create_vpc_route_table_name: "{{ create_vpc_title }} Route Table"
+create_vpc_security_group_name: "{{ create_vpc_title }} SG"
+create_vpc_vpc_cidr_block: "11.0.0.0/16"
+create_vpc_subnet_cidr_block: "11.0.1.0/24"
+create_vpc_destination_cidr_block: "0.0.0.0/0"
+create_vpc_region: "eu-west-2"
+create_vpc_zone: "eu-west-2a"
+
+create_vpc_instance_type: "t2.medium"
+create_vpc_instances:
+  - "amq1"
+  - "amq2"
+  - "amq3"
+
+create_vpc_ec2_keypair: "{{ playbook_dir }}/roles/configure_bootstrap/files/ec2_keypair.pem"

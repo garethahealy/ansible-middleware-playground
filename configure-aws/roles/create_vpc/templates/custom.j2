@@ -1,0 +1,9 @@
+---
+amq1:
+  hosts:
+{% for node in private_dns_names %}
+{% if node.name == "amq1" %}
+    {{ node.dns }}:
+      amq_broker_instance_name: {{ node.name }}
+{% endif %}
+{% endfor %}

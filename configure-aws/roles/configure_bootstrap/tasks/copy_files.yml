@@ -1,0 +1,16 @@
+---
+- name: Copy files to bootstrap
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /home/ec2-user
+    mode: "0755"
+  loop:
+    - "{{ playbook_dir }}/../inventory"
+    - "{{ playbook_dir }}/../playbooks"
+    - "{{ playbook_dir }}/../scripts/move-to-upstream.sh"
+
+- name: Copy ec2_keypair.pem to bootstrap
+  ansible.builtin.copy:
+    src: files/ec2_keypair.pem
+    dest: /home/ec2-user/ec2_keypair.pem
+    mode: "0400"

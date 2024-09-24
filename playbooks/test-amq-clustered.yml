@@ -1,0 +1,58 @@
+---
+- name: Test AMQ clustered installation
+  hosts: localhost
+  gather_facts: false
+  roles:
+    - test_amq
+  tasks:
+    ## Scenario:
+    # Start a consumer on each broker for 200 messages, a single producer on one of the brokers at random, for 600 messages
+    # All consumers should get 200 each, if they don't, test fails which suggests clustering is not working as expected
+
+    - name: Set DNSs
+      ansible.builtin.set_fact:
+        amq1: "{{ private_dns_names | selectattr('name', 'equalto', 'amq1') | first }}"
+        amq2: "{{ private_dns_names | selectattr('name', 'equalto', 'amq2') | first }}"
+        amq3: "{{ private_dns_names | selectattr('name', 'equalto', 'amq3') | first }}"
+
+    - name: Start consumer on amq1
+      ansible.builtin.command: "{{ artemis_bin }} consumer {{ test_amq_consumer_args }} --url tcp://{{ amq1.dns }}:61616"
+      poll: 0
+      async: 60
+      changed_when: false
+      register: amq1_consumer
+
+    - name: Start consumer on amq2
+      ansible.builtin.command: "{{ artemis_bin }} consumer {{ test_amq_consumer_args }} --url tcp://{{ amq2.dns }}:61616"
+      poll: 0
+      async: 60
+      changed_when: false
+      register: amq2_consumer
+
+    - name: Start consumer on amq3
+      ansible.builtin.command: "{{ artemis_bin }} consumer {{ test_amq_consumer_args }} --url tcp://{{ amq3.dns }}:61616"
+      poll: 0
+      async: 60
+      changed_when: false
+      register: amq3_consumer
+
+    - name: Set producer facts
+      ansible.builtin.set_fact:
+        producer_instance: "amq{{ 3 | random }}"
+        amq_producer: "{{ private_dns_names | selectattr('name', 'equalto', producer_instance) }}"
+
+    - name: Start producer on {{ producer_instance }}
+      ansible.builtin.command: "{{ artemis_bin }} producer {{ test_amq_producer_600_args }} --url tcp://{{ amq_producer.dns }}:61616"
+      changed_when: false
+
+    - name: Wait for consumers to end
+      ansible.builtin.async_status:
+        jid: "{{ item.results[0].ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 5
+      delay: 10
+      loop:
+        - "{{ amq1_consumer }}"
+        - "{{ amq2_consumer }}"
+        - "{{ amq3_consumer }}"

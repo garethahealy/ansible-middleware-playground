@@ -1,10 +1,10 @@
 .idea/*
 
-_creds.sh
-configure-aws/configure_bootstrap/files/my_keypair.pem
+scripts/_creds.sh
+scripts/_creds_update_aws_secrets.sh
+configure-aws/roles/configure_bootstrap/files/*.pem
+configure-aws/roles/configure_bootstrap/files/*.pub
+configure-aws/vault-password.sec
 
-inventory/all.yml
-inventory/clustered.yml
-inventory/federated.yml
-inventory/master-slave.yml
-configure-aws/inventory/bootstrap.yml
+inventory/*.yml
+configure-aws/inventory/*.yml

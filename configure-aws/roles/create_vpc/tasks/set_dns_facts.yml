@@ -1,0 +1,36 @@
+---
+- name: Get bootstrap node info
+  amazon.aws.ec2_instance_info:
+    region: "{{ create_vpc_region }}"
+    filters:
+      instance-state-name: ["running"]
+      "tag:Name": "bootstrap"
+  register: bootstrap_node
+
+- name: Set bootstrap public_dns_name
+  ansible.builtin.set_fact:
+    bootstrap_public_dns_name: "{{ item.network_interfaces[0].association.public_dns_name }}"
+  loop: "{{ bootstrap_node.instances }}"
+  no_log: true
+
+- name: Get AMQ nodes info
+  amazon.aws.ec2_instance_info:
+    region: "{{ create_vpc_region }}"
+    filters:
+      instance-state-name: ["running"]
+      "tag:Name": "amq*"
+  register: amq_nodes
+
+- name: Create private_dns_names
+  ansible.builtin.set_fact:
+    private_dns_names_unsorted: []
+
+- name: Set AMQ nodes private_dns_names
+  ansible.builtin.set_fact:
+    private_dns_names_unsorted: "{{ private_dns_names_unsorted + [{'name': item.tags.Name, 'dns': item.network_interfaces[0].private_dns_name}] }}"
+  loop: "{{ amq_nodes.instances }}"
+  no_log: true
+
+- name: Sort private_dns_names
+  ansible.builtin.set_fact:
+    private_dns_names: "{{ private_dns_names_unsorted | sort(attribute='name') }}"

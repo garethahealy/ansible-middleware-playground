@@ -1,0 +1,85 @@
+---
+- name: Test AMQ master/slave installation
+  hosts: localhost
+  gather_facts: false
+  vars:
+    # SSH key
+    ansible_ssh_private_key_file: ec2_keypair.pem
+  roles:
+    - test_amq
+  tasks:
+    ## Scenario:
+    # Start a producer and consumer on AMQ1 (primary) and start a producer on AMQ2 (backup) which should fail, to validate primary/backup is working
+    # Start a producer on AMQ1 (primary), stop AMQ1 which should cause AMQ2 (backup) to start up.
+    # Attach consumer to AMQ2 and get 200 messages, if it does not, test fails
+    # Reset the brokers by stop/starting AMQ1/2 to as they were and validate AMQ1 is primary and working
+
+    - name: Set DNSs
+      ansible.builtin.set_fact:
+        amq1: "{{ private_dns_names | selectattr('name', 'equalto', 'amq1') | first }}"
+        amq2: "{{ private_dns_names | selectattr('name', 'equalto', 'amq2') | first }}"
+
+    # Validate
+    - name: Start producer on amq1
+      ansible.builtin.command: "{{ artemis_bin }} producer {{ test_amq_producer_args }} --url tcp://{{ amq1.dns }}:61616"
+      changed_when: false
+
+    - name: Start consumer on amq1
+      ansible.builtin.command: "{{ artemis_bin }} consumer {{ test_amq_consumer_args }} --url tcp://{{ amq1.dns }}:61616"
+      changed_when: false
+
+    - name: Start producer on amq2
+      ansible.builtin.command: "{{ artemis_bin }} producer {{ test_amq_producer_args }} --url tcp://{{ amq2.dns }}:61616"
+      changed_when: false
+      register: amq2_result
+      failed_when: "'Connection failed' not in amq2_result.stderr"
+
+    # Test
+    - name: Start producer on amq1
+      ansible.builtin.command: "{{ artemis_bin }} producer {{ test_amq_producer_args }} --url tcp://{{ amq1.dns }}:61616"
+      changed_when: false
+
+    - name: Stop amq1 system.d service
+      delegate_to: amq1
+      become: true
+      throttle: 1
+      ansible.builtin.systemd_service:
+        name: "amq1"
+        state: stopped
+
+    - name: Start consumer on amq2
+      ansible.builtin.command: "{{ artemis_bin }} consumer {{ test_amq_consumer_args }} --url tcp://{{ amq2.dns }}:61616"
+      changed_when: false
+
+    # Reset
+    - name: Stop amq2 system.d service
+      delegate_to: amq2
+      become: true
+      throttle: 1
+      ansible.builtin.systemd_service:
+        name: "amq2"
+        state: stopped
+
+    - name: Start amq1 system.d service
+      delegate_to: amq1
+      become: true
+      throttle: 1
+      ansible.builtin.systemd_service:
+        name: "amq1"
+        state: started
+
+    - name: Start amq2 system.d service
+      delegate_to: amq2
+      become: true
+      throttle: 1
+      ansible.builtin.systemd_service:
+        name: "amq2"
+        state: started
+
+    - name: Start producer on amq1
+      ansible.builtin.command: "{{ artemis_bin }} producer {{ test_amq_producer_args }} --url tcp://{{ amq1.dns }}:61616"
+      changed_when: false
+
+    - name: Start consumer on amq1
+      ansible.builtin.command: "{{ artemis_bin }} consumer {{ test_amq_consumer_args }} --url tcp://{{ amq1.dns }}:61616"
+      changed_when: false

@@ -1,0 +1,12 @@
+---
+- name: Create EFS volume
+  community.aws.efs:
+    region: "{{ create_vpc_region }}"
+    name: amq-data
+    tags:
+      Name: amq-data
+    targets:
+      - subnet_id: "{{ subnet_result.subnet.id }}"
+        security_groups:
+          - "{{ security_group_results.group_id }}"
+    state: present
