@@ -56,8 +56,6 @@ ansible-playbook -i inventory/amq1.yml test-amq-masterslave.yml \
 
 ## 3 Clustered Brokers
 
-See [BUG](https://github.com/ansible-middleware/amq/issues/120)
-
 Deploy clustered brokers
 ```bash
 ansible-playbook -i inventory/all.yml deploy-amq-clustered.yml \
