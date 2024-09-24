@@ -4,5 +4,7 @@ _creds.sh
 configure-aws/configure_bootstrap/files/my_keypair.pem
 
 inventory/all.yml
-inventory/amq1.yml
+inventory/clustered.yml
+inventory/federated.yml
+inventory/master-slave.yml
 configure-aws/inventory/bootstrap.yml

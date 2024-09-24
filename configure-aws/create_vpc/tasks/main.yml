@@ -196,8 +196,26 @@
     dest: ../inventory/all.yml
     mode: "0755"
 
-- name: Template inventory amq1.yml
+- name: Template inventory clustered.yml
   ansible.builtin.template:
-    src: ../inventory/amq1.j2
-    dest: ../inventory/amq1.yml
+    src: ../inventory/clustered.j2
+    dest: ../inventory/clustered.yml
+    mode: "0755"
+
+- name: Template inventory clustered.yml
+  ansible.builtin.template:
+    src: ../inventory/clustered.j2
+    dest: ../inventory/clustered.yml
+    mode: "0755"
+
+- name: Template inventory federated.yml
+  ansible.builtin.template:
+    src: ../inventory/federated.j2
+    dest: ../inventory/federated.yml
+    mode: "0755"
+
+- name: Template inventory master-slave.yml
+  ansible.builtin.template:
+    src: ../inventory/master-slave.j2
+    dest: ../inventory/master-slave.yml
     mode: "0755"

@@ -1,0 +1,33 @@
+---
+all:
+  hosts:
+{% for node in private_dns_names %}
+{% if node.name == "amq1" %}
+    {{ node.name }}:
+      ansible_host: {{ node.dns }}
+{% endif %}
+{% endfor %}
+
+single:
+  hosts:
+{% for node in private_dns_names %}
+{% if node.name == "amq1" %}
+    {{ node.dns }}:
+      amq_broker_instance_name: {{ node.name }}
+{% endif %}
+{% endfor %}
+
+dual:
+  hosts:
+{% for node in private_dns_names %}
+{% if node.name == "amq1" or node.name == "amq2" %}
+{% if node.name == "amq1" %}
+{% set role = "master" %}
+{% else %}
+{% set role = "slave" %}
+{% endif %}
+    {{ node.dns }}:
+      amq_broker_instance_name: {{ node.name }}
+      activemq_ha_role: {{ role }}
+{% endif %}
+{% endfor %}

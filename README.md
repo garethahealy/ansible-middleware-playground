@@ -26,7 +26,7 @@ ansible all -i inventory/all.yml -m ansible.builtin.ping --user ec2-user --priva
 
 Deploy single broker with a custom broker.xml
 ```bash
-ansible-playbook -i inventory/all.yml deploy-amq-custom.yml \
+ansible-playbook -i inventory/master-slave.yml deploy-amq-custom.yml \
   -e rhn_username=${RHN_USERNAME} \
   -e rhn_password=${RHN_PASSWORD}
 ```
@@ -42,14 +42,14 @@ ansible-playbook test-amq-custom.yml \
 
 Deploy master/slave broker, with shared storage
 ```bash
-ansible-playbook -i inventory/all.yml deploy-amq-masterslave.yml \
+ansible-playbook -i inventory/master-slave.yml deploy-amq-masterslave.yml \
   -e rhn_username=${RHN_USERNAME} \
   -e rhn_password=${RHN_PASSWORD}
 ```
 
 Test master/slave broker configuration
 ```bash
-ansible-playbook -i inventory/amq1.yml test-amq-masterslave.yml \
+ansible-playbook -i inventory/master-slave.yml test-amq-masterslave.yml \
   -e aws_access_key=${AWS_ACCESS_KEY_ID} \
   -e aws_secret_key=${AWS_SECRET_ACCESS_KEY}
 ```
@@ -58,7 +58,7 @@ ansible-playbook -i inventory/amq1.yml test-amq-masterslave.yml \
 
 Deploy clustered brokers
 ```bash
-ansible-playbook -i inventory/all.yml deploy-amq-clustered.yml \
+ansible-playbook -i inventory/clustered.yml deploy-amq-clustered.yml \
   -e rhn_username=${RHN_USERNAME} \
   -e rhn_password=${RHN_PASSWORD}
 ```
@@ -72,11 +72,11 @@ ansible-playbook test-amq-clustered-source.yml \
 
 ## 3 Federated Brokers
 
-See [BUG](https://github.com/ansible-middleware/amq/issues/TODO)
+See [BUG](https://github.com/ansible-middleware/amq/issues/177)
 
 Deploy federated brokers
 ```bash
-ansible-playbook -i inventory/all.yml deploy-amq-federated.yml \
+ansible-playbook -i inventory/federated.yml deploy-amq-federated.yml \
   -e rhn_username=${RHN_USERNAME} \
   -e rhn_password=${RHN_PASSWORD}
 ```
