@@ -49,7 +49,7 @@ jobs:
           
           echo $SSH_KEY_VAULT_PASS > vault-password.sec
           
-          ansible-playbook deploy.yml \
+          ansible-playbook deploy.yml --skip-tags blank \
             --vault-password-file=vault-password.sec \
             -e SSH_KEY_VAULT_PASS=${SSH_KEY_VAULT_PASS} \
             -e aws_access_key=${AWS_ACCESS_KEY_ID} \
