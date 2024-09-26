@@ -1,0 +1,6 @@
+---
+test_amq_region: "eu-west-2"
+test_amq_artemis_bin_glob: "{{ playbook_dir }}/../amq-broker/apache-artemis-*/bin/artemis"
+test_amq_producer_args: "--user amq-broker --password amq-broker --message-count 200 --threads 4"
+test_amq_producer_600_args: "--user amq-broker --password amq-broker --message-count 600 --threads 4"
+test_amq_consumer_args: "--user amq-broker --password amq-broker --message-count 200 --receive-timeout 30000"

@@ -5,15 +5,12 @@
     name: "{{ item }}"
     state: present
   loop:
-    - python3.11
-    - python3.11-pip
     - unzip
     - java-11-openjdk-headless
     - git
 
 - name: Install packages via pip
   ansible.builtin.pip:
-    executable: /usr/bin/pip3.11
     name: "{{ item }}"
   loop:
     - boto3

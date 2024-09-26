@@ -4,4 +4,5 @@ collections:
   - name: ansible.posix
   - name: amazon.aws
   - name: community.aws
+  - name: community.crypto
   - name: redhat.amq_broker

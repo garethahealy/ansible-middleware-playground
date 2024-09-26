@@ -1,0 +1,9 @@
+---
+- name: Install packages via dnf
+  become: true
+  ansible.builtin.dnf:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - python3.11
+    - python3.11-pip

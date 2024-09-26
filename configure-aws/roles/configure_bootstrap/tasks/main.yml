@@ -1,12 +1,18 @@
 ---
 - name: Install linux packages
   ansible.builtin.include_tasks: linux_packages.yml
+  tags:
+    - blank
 
 - name: Install ansible packages
   ansible.builtin.include_tasks: ansible_packages.yml
+  tags:
+    - blank
 
 - name: Update known_hosts
   ansible.builtin.include_tasks: update_ssh.yml
+  tags:
+    - blank
 
 - name: Copy inventory and playbooks to bootstrap
   ansible.builtin.include_tasks: copy_files.yml

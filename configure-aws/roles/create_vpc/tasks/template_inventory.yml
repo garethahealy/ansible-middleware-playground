@@ -11,6 +11,7 @@
   ansible.builtin.set_fact:
     bootstrap_public_dns_name: "{{ item.network_interfaces[0].association.public_dns_name }}"
   loop: "{{ bootstrap_node.instances }}"
+  no_log: true
 
 - name: Get AMQ nodes info
   amazon.aws.ec2_instance_info:
@@ -28,6 +29,7 @@
   ansible.builtin.set_fact:
     private_dns_names_unsorted: "{{ private_dns_names_unsorted + [{'name': item.tags.Name, 'dns': item.network_interfaces[0].private_dns_name}] }}"
   loop: "{{ amq_nodes.instances }}"
+  no_log: true
 
 - name: Sort private_dns_names
   ansible.builtin.set_fact:
@@ -68,22 +70,3 @@
     src: templates/master-slave.j2
     dest: "{{ playbook_dir }}/../inventory/master-slave.yml"
     mode: "0755"
-
-- name: Add bootstrap host to in-memory inventory
-  ansible.builtin.add_host:
-    hostname: "{{ bootstrap_public_dns_name }}"
-    groups:
-      - bootstrap
-
-- name: Scan for SSH host keys
-  ansible.builtin.shell: ssh-keyscan {{ bootstrap_public_dns_name }} 2>/dev/null
-  register: ssh_scan
-  changed_when: false
-
-- name: Update known_hosts
-  ansible.builtin.known_hosts:
-    name: "{{ bootstrap_public_dns_name }}"
-    key: "{{ ssh_scan.stdout }}"
-
-- name: Check bootstrap is pingable
-  ansible.builtin.ping:

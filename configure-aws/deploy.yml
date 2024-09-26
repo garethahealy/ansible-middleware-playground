@@ -1,20 +1,36 @@
 ---
 - name: Create AWS infrastructure
   hosts: localhost
-  gather_facts: false
+  gather_facts: true
   vars:
     # https://eu-west-2.console.aws.amazon.com/ec2/home?region=eu-west-2#AMICatalog:
     create_vpc_image_id: "ami-016bc0ffc60455bdf"
+  environment:
+    SSH_KEY_VAULT_PASS: "{{ SSH_KEY_VAULT_PASS }}"
   roles:
     - name: "Creating VPC"
       role: "create_vpc"
+
+# Python 3.9 comes with the AMIs, we need 3.11 so needs to be included before using in the configure_bootstrap role
+- name: Configure python on bootstrap box
+  hosts: bootstrap
+  remote_user: ec2-user
+  gather_facts: true
+  vars:
+    ansible_ssh_private_key_file: roles/configure_bootstrap/files/ec2_keypair.pem
+  roles:
+    - name: "Configure bootstrap with latest python"
+      role: "configure_bootstrap_python"
+  tags:
+    - blank
 
 - name: Configure bootstrap box
   hosts: bootstrap
   remote_user: ec2-user
   gather_facts: true
   vars:
-    ansible_ssh_private_key_file: roles/configure_bootstrap/files/my_keypair.pem
+    ansible_ssh_private_key_file: roles/configure_bootstrap/files/ec2_keypair.pem
+    ansible_python_interpreter: /usr/bin/python3.11
   environment:
     ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN: "{{ ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN }}"
   roles:

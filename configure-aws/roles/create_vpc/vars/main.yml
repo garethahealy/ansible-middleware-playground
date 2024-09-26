@@ -16,3 +16,5 @@ create_vpc_instances:
   - "amq1"
   - "amq2"
   - "amq3"
+
+create_vpc_ec2_keypair: "{{ playbook_dir }}/roles/configure_bootstrap/files/ec2_keypair.pem"

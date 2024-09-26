@@ -1,0 +1,6 @@
+---
+- name: Get instances
+  ansible.builtin.include_tasks: instances.yml
+
+- name: Resolve artemis bin
+  ansible.builtin.include_tasks: artemis_bin.yml

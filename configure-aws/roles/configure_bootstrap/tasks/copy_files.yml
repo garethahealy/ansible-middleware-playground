@@ -10,8 +10,8 @@
     - "{{ playbook_dir }}/../playbooks"
     - "{{ playbook_dir }}/../scripts"
 
-- name: Copy my_keypair.pem to bootstrap
+- name: Copy ec2_keypair.pem to bootstrap
   ansible.builtin.copy:
-    src: files/my_keypair.pem
-    dest: /home/ec2-user/my_keypair.pem
+    src: files/ec2_keypair.pem
+    dest: /home/ec2-user/ec2_keypair.pem
     mode: "0400"

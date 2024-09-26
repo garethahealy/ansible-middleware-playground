@@ -1,51 +1,19 @@
 ---
 - name: Test AMQ master/slave installation
   hosts: localhost
+  gather_facts: false
   vars:
     # SSH key
-    ansible_ssh_private_key_file: my_keypair.pem
-    artemis_bin_glob: "{{ playbook_dir }}/../amq-broker/apache-artemis-*/bin/artemis"
+    ansible_ssh_private_key_file: ec2_keypair.pem
+  roles:
+    - test_amq
   tasks:
-    - name: Include collections defaults
-      ansible.builtin.include_vars: ~/.ansible/collections/ansible_collections/redhat/amq_broker/roles/amq_broker/defaults/main.yml
-
-    - name: Get AMQ nodes info
-      amazon.aws.ec2_instance_info:
-        region: "eu-west-2"
-        aws_access_key: "{{ aws_access_key }}"
-        aws_secret_key: "{{ aws_secret_key }}"
-        filters:
-          instance-state-name: ["running"]
-          "tag:Name": "amq*"
-      register: amq_nodes
-
-    - name: Create private_dns_names
-      ansible.builtin.set_fact:
-        private_dns_names: []
-
-    - name: Set AMQ nodes private_dns_names
-      ansible.builtin.set_fact:
-        private_dns_names: "{{ private_dns_names + [{'name': item.tags.Name, 'dns': item.network_interfaces[0].private_dns_name}] }}"
-      loop: "{{ amq_nodes.instances }}"
-
-    - name: Ensures /home/ec2-user/amq-broker exists
-      ansible.builtin.file:
-        path: /home/ec2-user/amq-broker
-        mode: "0755"
-        state: directory
-
-    - name: Extract amq-broker-bin.zip
-      ansible.builtin.unarchive:
-        src: "../{{ amq_broker_archive }}"
-        dest: /home/ec2-user/amq-broker
-        mode: "0755"
-
-    - name: Set artemis_bin fact
-      ansible.builtin.set_fact:
-        artemis_bin: "{{ artemis_bin_glob | fileglob | first }}"
+    ## Scenario:
+    # Start a producer on AMQ1 (primary), stop AMQ1 which should cause AMQ2 (backup) to start up. Attach consumer to AMQ2
+    # Consumer on AMQ2 should get 200 messages, if it does not, test fails
 
     - name: Start producer on amq1
-      ansible.builtin.command: "{{ artemis_bin }} producer --user amq-broker --password amq-broker --url tcp://{{ item.dns }}:61616"
+      ansible.builtin.command: "{{ artemis_bin }} producer {{ test_amq_producer_args }} --url tcp://{{ item.dns }}:61616"
       loop: "{{ private_dns_names | selectattr('name', 'equalto', 'amq1') }}"
       changed_when: false
 
@@ -58,6 +26,6 @@
         state: stopped
 
     - name: Start consumer on amq2
-      ansible.builtin.command: "{{ artemis_bin }} consumer --user amq-broker --password amq-broker --url tcp://{{ item.dns }}:61616"
+      ansible.builtin.command: "{{ artemis_bin }} consumer {{ test_amq_consumer_args }} --url tcp://{{ item.dns }}:61616"
       loop: "{{ private_dns_names | selectattr('name', 'equalto', 'amq2') }}"
       changed_when: false

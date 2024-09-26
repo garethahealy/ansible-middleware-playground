@@ -18,9 +18,7 @@ jobs:
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
 
       - name: Copy ansible.cfg
-        run: |
-          sudo mkdir -p /etc/ansible
-          sudo cp configure-aws/roles/configure_bootstrap/files/ansible.cfg /etc/ansible/ansible.cfg
+        run: cp configure-aws/roles/configure_bootstrap/files/ansible.cfg ~/.ansible.cfg
 
       - name: Install requirements
         env:

@@ -2,12 +2,24 @@
 - name: Create a new EC2 key pair
   amazon.aws.ec2_key:
     region: "{{ create_vpc_region }}"
-    name: my_keypair
-    file_name: "{{ playbook_dir }}/roles/configure_bootstrap/files/my_keypair.pem"
+    name: "{{ ansible_hostname }}_keypair"
+    file_name: "{{ create_vpc_ec2_keypair }}"
     force: true
     state: present
 
 - name: Change file ownership for key
   ansible.builtin.file:
-    path: "{{ playbook_dir }}/roles/configure_bootstrap/files/my_keypair.pem"
+    path: "{{ create_vpc_ec2_keypair }}"
+    mode: "0400"
+
+- name: Generate an OpenSSL public key in PEM format
+  community.crypto.openssl_publickey:
+    path: "{{ playbook_dir }}/roles/configure_bootstrap/files/ec2_keypair.pub"
+    privatekey_path: "{{ create_vpc_ec2_keypair }}"
+
+- name: Encrypt ec2_keypair.pem
+  ansible.builtin.copy:
+    content: "{{ lookup('ansible.builtin.file', create_vpc_ec2_keypair) | ansible.builtin.vault(SSH_KEY_VAULT_PASS) }}"
+    dest: "{{ create_vpc_ec2_keypair }}.enc"
+    decrypt: false
     mode: "0400"

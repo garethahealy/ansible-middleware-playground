@@ -5,7 +5,7 @@
     name: "bootstrap"
     image_id: "{{ create_vpc_image_id }}"
     instance_type: "{{ create_vpc_instance_type }}"
-    key_name: "my_keypair"
+    key_name: "{{ ansible_hostname }}_keypair"
     vpc_subnet_id: "{{ subnet_result.subnet.id }}"
     network_interfaces:
       - assign_public_ip: true
@@ -19,7 +19,7 @@
     name: "{{ item }}"
     image_id: "{{ create_vpc_image_id }}"
     instance_type: "{{ create_vpc_instance_type }}"
-    key_name: "my_keypair"
+    key_name: "{{ ansible_hostname }}_keypair"
     vpc_subnet_id: "{{ subnet_result.subnet.id }}"
     network_interfaces:
       - assign_public_ip: true

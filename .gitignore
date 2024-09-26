@@ -1,7 +1,9 @@
 .idea/*
 
 scripts/_creds.sh
-configure-aws/roles/configure_bootstrap/files/my_keypair.pem
+configure-aws/roles/configure_bootstrap/files/*.pem
+configure-aws/roles/configure_bootstrap/files/*.pub
+configure-aws/vault-password.sec
 
 inventory/all.yml
 inventory/clustered.yml

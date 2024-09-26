@@ -8,7 +8,7 @@ If you don't have any infrastructure, see [README.md](configure-aws%2FREADME.md)
 
 Check hosts are OK (_run from bootstrap_)
 ```bash
-ansible all -i inventory/all.yml -m ansible.builtin.ping --user ec2-user --private-key ~/my_keypair.pem
+ansible all -i inventory/all.yml -m ansible.builtin.ping --user ec2-user --private-key ~/ec2_keypair.pem
 ```
 
 Install the required roles

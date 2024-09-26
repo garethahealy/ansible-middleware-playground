@@ -11,7 +11,7 @@
 
 - name: Print SSH to boostrap
   vars:
-    key: "roles/configure_bootstrap/files/my_keypair.pem"
+    key: "roles/configure_bootstrap/files/ec2_keypair.pem"
     host: "{{ ec2_bootstrap_node_info.instances[0].network_interfaces[0].association.public_dns_name }}"
   ansible.builtin.debug:
     msg: "ssh -i {{ key }} ec2-user@{{ host }}"

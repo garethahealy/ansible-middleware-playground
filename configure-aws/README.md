@@ -20,6 +20,8 @@ export ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN="replace_me"
 Deploy the AWS infrastructure (_run from local_)
 ```bash
 ansible-playbook deploy.yml \
+  --vault-password-file=vault-password.sec \
+  -e SSH_KEY_VAULT_PASS=${SSH_KEY_VAULT_PASS} \
   -e aws_access_key=${AWS_ACCESS_KEY_ID} \
   -e aws_secret_key=${AWS_SECRET_ACCESS_KEY} \
   -e ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN=${ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN}

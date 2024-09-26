@@ -18,6 +18,8 @@
       Name: "{{ create_vpc_igw_name }}"
     state: present
   register: igw_result
+  tags:
+    - blank
 
 - name: Create VPC Subnet
   amazon.aws.ec2_vpc_subnet:
@@ -30,6 +32,8 @@
       Name: "{{ create_vpc_subnet_name }}"
     state: present
   register: subnet_result
+  tags:
+    - blank
 
 - name: Create VPC Public Subnet Route Table
   amazon.aws.ec2_vpc_route_table:
@@ -44,49 +48,5 @@
         gateway_id: "{{ igw_result.gateway_id }}"
     state: present
   register: public_route_table
-
-- name: Get my public IP
-  register: ip_output
-  community.general.ipify_facts:
-
-- name: Create Security Group
-  amazon.aws.ec2_security_group:
-    region: "{{ create_vpc_region }}"
-    vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
-    name: "{{ create_vpc_security_group_name }}"
-    description: "{{ create_vpc_security_group_name }}"
-    tags:
-      Name: "{{ create_vpc_security_group_name }}"
-    rules:
-      - proto: tcp
-        from_port: 22
-        to_port: 22
-        rule_desc: allow SSH traffic from my laptop
-        cidr_ip: "{{ ip_output.ansible_facts.ipify_public_ip }}/32"
-      - proto: tcp
-        from_port: 8161
-        to_port: 8161
-        rule_desc: allow AMQ Console traffic from my laptop
-        cidr_ip: "{{ ip_output.ansible_facts.ipify_public_ip }}/32"
-      - proto: tcp
-        from_port: 22
-        to_port: 22
-        rule_desc: allow SSH traffic within VPC
-        cidr_ip: "{{ create_vpc_subnet_cidr_block }}"
-      - proto: tcp
-        from_port: 8161
-        to_port: 8161
-        rule_desc: allow AMQ Console traffic within VPC
-        cidr_ip: "{{ create_vpc_subnet_cidr_block }}"
-      - proto: tcp
-        from_port: 61616
-        to_port: 61616
-        rule_desc: allow AMQ traffic within VPC
-        cidr_ip: "{{ create_vpc_subnet_cidr_block }}"
-      - proto: tcp
-        from_port: 2049
-        to_port: 2049
-        rule_desc: allow EFS traffic within VPC
-        cidr_ip: "{{ create_vpc_subnet_cidr_block }}"
-    state: present
-  register: security_group_results
+  tags:
+    - blank

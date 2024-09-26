@@ -1,49 +1,16 @@
 ---
 - name: Test AMQ clustered installation
   hosts: localhost
-  vars:
-    artemis_bin_glob: "{{ playbook_dir }}/../amq-broker/apache-artemis-*/bin/artemis"
+  gather_facts: false
+  roles:
+    - test_amq
   tasks:
-    - name: Include collections defaults
-      ansible.builtin.include_vars: ~/.ansible/collections/ansible_collections/redhat/amq_broker/roles/amq_broker/defaults/main.yml
-
-    - name: Get AMQ nodes info
-      amazon.aws.ec2_instance_info:
-        region: "eu-west-2"
-        aws_access_key: "{{ aws_access_key }}"
-        aws_secret_key: "{{ aws_secret_key }}"
-        filters:
-          instance-state-name: ["running"]
-          "tag:Name": "amq*"
-      register: amq_nodes
-
-    - name: Create private_dns_names
-      ansible.builtin.set_fact:
-        private_dns_names: []
-
-    - name: Set AMQ nodes private_dns_names
-      ansible.builtin.set_fact:
-        private_dns_names: "{{ private_dns_names + [{'name': item.tags.Name, 'dns': item.network_interfaces[0].private_dns_name}] }}"
-      loop: "{{ amq_nodes.instances }}"
-
-    - name: Ensures /home/ec2-user/amq-broker exists
-      ansible.builtin.file:
-        path: /home/ec2-user/amq-broker
-        mode: "0755"
-        state: directory
-
-    - name: Extract amq-broker-bin.zip
-      ansible.builtin.unarchive:
-        src: "../{{ amq_broker_archive }}"
-        dest: /home/ec2-user/amq-broker
-        mode: "0755"
-
-    - name: Set artemis_bin fact
-      ansible.builtin.set_fact:
-        artemis_bin: "{{ artemis_bin_glob | fileglob | first }}"
+    ## Scenario:
+    # Start a consumer on each broker for 200 messages, a single producer on one of the brokers at random, for 600 messages
+    # All consumers should get 200 each, if they don't, test fails which suggests clustering is not working as expected
 
     - name: Start consumer on amq1
-      ansible.builtin.command: "{{ artemis_bin }} consumer --user amq-broker --password amq-broker --message-count 200 --url tcp://{{ item.dns }}:61616"
+      ansible.builtin.command: "{{ artemis_bin }} consumer {{ test_amq_consumer_args }} --url tcp://{{ item.dns }}:61616"
       poll: 0
       async: 60
       loop: "{{ private_dns_names | selectattr('name', 'equalto', 'amq1') }}"
@@ -51,7 +18,7 @@
       register: amq1_consumer
 
     - name: Start consumer on amq2
-      ansible.builtin.command: "{{ artemis_bin }} consumer --user amq-broker --password amq-broker --message-count 200 --url tcp://{{ item.dns }}:61616"
+      ansible.builtin.command: "{{ artemis_bin }} consumer {{ test_amq_consumer_args }} --url tcp://{{ item.dns }}:61616"
       poll: 0
       async: 60
       loop: "{{ private_dns_names | selectattr('name', 'equalto', 'amq2') }}"
@@ -59,18 +26,21 @@
       register: amq2_consumer
 
     - name: Start consumer on amq3
-      ansible.builtin.command: "{{ artemis_bin }} consumer --user amq-broker --password amq-broker --message-count 200 --url tcp://{{ item.dns }}:61616"
+      ansible.builtin.command: "{{ artemis_bin }} consumer {{ test_amq_consumer_args }} --url tcp://{{ item.dns }}:61616"
       poll: 0
       async: 60
       loop: "{{ private_dns_names | selectattr('name', 'equalto', 'amq3') }}"
       changed_when: false
       register: amq3_consumer
 
-    - name: Start producer on amq1
-      ansible.builtin.command: "{{ artemis_bin }} producer --user amq-broker --password amq-broker --message-count 600 --url tcp://{{ item.dns }}:61616"
-      loop: "{{ private_dns_names | selectattr('name', 'equalto', 'amq1') }}"
+    - name: Set producer_instance fact
+      ansible.builtin.set_fact:
+        producer_instance: "amq{{ 3 | random }}"
+
+    - name: Start producer on {{ producer_instance }}
+      ansible.builtin.command: "{{ artemis_bin }} producer {{ test_amq_producer_600_args }} --url tcp://{{ item.dns }}:61616"
+      loop: "{{ private_dns_names | selectattr('name', 'equalto', producer_instance) }}"
       changed_when: false
-      register: amq1_producer
 
     - name: Wait for consumers to end
       ansible.builtin.async_status:
