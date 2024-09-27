@@ -8,8 +8,12 @@ on:
 permissions: read-all
 
 jobs:
-  configure_aws:
+  test_topology:
     runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      matrix:
+        topology: [ custom, master-slave ]
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
@@ -21,13 +25,12 @@ jobs:
 
       - uses: actions/setup-python@f677139bbe7f9c59b41e40162b753c062f5d49a3 # v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
+          cache: "pip"
 
       - name: Setup python deps
         run: |
-          pip3 install boto3
-          pip3 install lxml
-          pip3 install ansible-core
+          pip3 install -r requirements.txt
 
       - name: Copy ansible.cfg
         run: cp configure-aws/roles/configure_bootstrap/files/ansible.cfg ~/.ansible.cfg
@@ -42,7 +45,6 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN: ${{ secrets.ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN }}
           SSH_KEY_VAULT_PASS: ${{ secrets.SSH_KEY_VAULT_PASS }}
         run: |
           pushd configure-aws
@@ -54,31 +56,47 @@ jobs:
             -e SSH_KEY_VAULT_PASS=${SSH_KEY_VAULT_PASS} \
             -e aws_access_key=${AWS_ACCESS_KEY_ID} \
             -e aws_secret_key=${AWS_SECRET_ACCESS_KEY} \
-            -e ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN=${ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN}
+            -e ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN="not-needed"
           
           echo "bootstrap_dns=$(cat inventory/bootstrap.yml | yq '.bootstrap.hosts' | head -c-2)" >> "$GITHUB_OUTPUT"
           
           popd
 
-      - name: Deploy and Test Custom
+      - name: Deploy ${{ matrix.topology }}
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           RHN_USERNAME: ${{ secrets.RHN_USERNAME }}
           RHN_PASSWORD: ${{ secrets.RHN_PASSWORD }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           BOOTSTRAP: ${{ steps.deploy.outputs.bootstrap_dns }}
         run: |
           ssh -i configure-aws/roles/configure_bootstrap/files/ec2_keypair.pem ec2-user@${BOOTSTRAP} "
-            ansible-playbook -i inventory/custom.yml playbooks/deploy-amq-custom.yml \
+            ansible-playbook -i inventory/${{ matrix.topology }}.yml playbooks/deploy-amq-${{ matrix.topology }}.yml \
               -e rhn_username=${RHN_USERNAME} \
-              -e rhn_password=${RHN_PASSWORD}
-  
-            ansible-playbook playbooks/test-amq-custom.yml \
+              -e rhn_password=${RHN_PASSWORD} \
               -e aws_access_key=${AWS_ACCESS_KEY_ID} \
               -e aws_secret_key=${AWS_SECRET_ACCESS_KEY}
           "
 
-      - name: Remove Custom
+      - name: Test ${{ matrix.topology }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          BOOTSTRAP: ${{ steps.deploy.outputs.bootstrap_dns }}
+        run: |
+          export test_inventory=""
+          if [[ "${{ matrix.topology }}" = "master-slave" ]]
+          then
+            test_inventory="-i inventory/master-slave-test.yml"
+          fi
+          
+          ssh -i configure-aws/roles/configure_bootstrap/files/ec2_keypair.pem ec2-user@${BOOTSTRAP} "
+            ansible-playbook ${test_inventory} playbooks/test-amq-${{ matrix.topology }}.yml \
+              -e aws_access_key=${AWS_ACCESS_KEY_ID} \
+              -e aws_secret_key=${AWS_SECRET_ACCESS_KEY}
+          "
+
+      - name: Remove ${{ matrix.topology }}
         if: always()
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
