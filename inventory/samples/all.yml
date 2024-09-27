@@ -7,4 +7,3 @@ all:
       amq_broker_instance_name: amq2
     ip-11-0-3-003.eu-west-2.compute.internal:
       amq_broker_instance_name: amq3
-

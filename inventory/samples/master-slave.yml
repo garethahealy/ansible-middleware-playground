@@ -3,7 +3,7 @@ masterslave:
   hosts:
     ip-11-0-1-001.eu-west-2.compute.internal:
       amq_broker_instance_name: amq1
-      activemq_ha_role: primary
+      amq_broker_ha_role: primary
     ip-11-0-2-002.eu-west-2.compute.internal:
       amq_broker_instance_name: amq2
-      activemq_ha_role: backup
+      amq_broker_ha_role: backup

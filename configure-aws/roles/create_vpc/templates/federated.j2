@@ -7,18 +7,18 @@ federated:
       amq_broker_connectors:
 {% for broker_node in private_dns_names %}
 {% if node.name == broker_node.name %}
-      - name: artemis
-        scheme: tcp
-        address: {{ broker_node.dns }}
-        port: 61616
+        - name: artemis
+          scheme: tcp
+          address: {{ broker_node.dns }}
+          port: 61616
 {% endif %}
 {% endfor %}
 {% for broker_node in private_dns_names %}
 {% if node.name != broker_node.name %}
-      - name: {{ broker_node.name }}
-        scheme: tcp
-        address: {{ broker_node.dns }}
-        port: 61616
+        - name: {{ broker_node.name }}
+          scheme: tcp
+          address: {{ broker_node.dns }}
+          port: 61616
 {% endif %}
 {% endfor %}
       amq_broker_federations:

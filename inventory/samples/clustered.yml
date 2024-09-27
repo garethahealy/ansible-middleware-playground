@@ -4,60 +4,60 @@ clustered:
     ip-11-0-1-001.eu-west-2.compute.internal:
       amq_broker_instance_name: amq1
       amq_broker_cluster_connections:
-      - name: amq2
-        value: tcp://ip-11-0-1-001.eu-west-2.compute.internal:61616
-      - name: amq3
-        value: tcp://ip-11-0-1-001.eu-west-2.compute.internal:61616
+        - name: amq2
+          value: tcp://ip-11-0-1-001.eu-west-2.compute.internal:61616
+        - name: amq3
+          value: tcp://ip-11-0-1-001.eu-west-2.compute.internal:61616
       amq_broker_connectors:
-      - name: artemis
-        scheme: tcp
-        address: ip-11-0-1-001.eu-west-2.compute.internal
-        port: 61616
-      - name: amq2
-        scheme: tcp
-        address: ip-11-0-2-002.eu-west-2.compute.internal
-        port: 61616
-      - name: amq3
-        scheme: tcp
-        address: ip-11-0-3-003.eu-west-2.compute.internal
-        port: 61616
+        - name: artemis
+          scheme: tcp
+          address: ip-11-0-1-001.eu-west-2.compute.internal
+          port: 61616
+        - name: amq2
+          scheme: tcp
+          address: ip-11-0-2-002.eu-west-2.compute.internal
+          port: 61616
+        - name: amq3
+          scheme: tcp
+          address: ip-11-0-3-003.eu-west-2.compute.internal
+          port: 61616
     ip-11-0-2-002.eu-west-2.compute.internal:
       amq_broker_instance_name: amq2
       amq_broker_cluster_connections:
-      - name: amq1
-        value: tcp://ip-11-0-2-002.eu-west-2.compute.internal:61616
-      - name: amq3
-        value: tcp://ip-11-0-2-002.eu-west-2.compute.internal:61616
+        - name: amq1
+          value: tcp://ip-11-0-2-002.eu-west-2.compute.internal:61616
+        - name: amq3
+          value: tcp://ip-11-0-2-002.eu-west-2.compute.internal:61616
       amq_broker_connectors:
-      - name: artemis
-        scheme: tcp
-        address: ip-11-0-2-002.eu-west-2.compute.internal
-        port: 61616
-      - name: amq1
-        scheme: tcp
-        address: ip-11-0-1-001.eu-west-2.compute.internal
-        port: 61616
-      - name: amq3
-        scheme: tcp
-        address: ip-11-0-3-003.eu-west-2.compute.internal
-        port: 61616
+        - name: artemis
+          scheme: tcp
+          address: ip-11-0-2-002.eu-west-2.compute.internal
+          port: 61616
+        - name: amq1
+          scheme: tcp
+          address: ip-11-0-1-001.eu-west-2.compute.internal
+          port: 61616
+        - name: amq3
+          scheme: tcp
+          address: ip-11-0-3-003.eu-west-2.compute.internal
+          port: 61616
     ip-11-0-3-003.eu-west-2.compute.internal:
       amq_broker_instance_name: amq3
       amq_broker_cluster_connections:
-      - name: amq1
-        value: tcp://ip-11-0-3-003.eu-west-2.compute.internal:61616
-      - name: amq2
-        value: tcp://ip-11-0-3-003.eu-west-2.compute.internal:61616
+        - name: amq1
+          value: tcp://ip-11-0-3-003.eu-west-2.compute.internal:61616
+        - name: amq2
+          value: tcp://ip-11-0-3-003.eu-west-2.compute.internal:61616
       amq_broker_connectors:
-      - name: artemis
-        scheme: tcp
-        address: ip-11-0-3-003.eu-west-2.compute.internal
-        port: 61616
-      - name: amq1
-        scheme: tcp
-        address: ip-11-0-1-001.eu-west-2.compute.internal
-        port: 61616
-      - name: amq2
-        scheme: tcp
-        address: ip-11-0-2-002.eu-west-2.compute.internal
-        port: 61616
+        - name: artemis
+          scheme: tcp
+          address: ip-11-0-3-003.eu-west-2.compute.internal
+          port: 61616
+        - name: amq1
+          scheme: tcp
+          address: ip-11-0-1-001.eu-west-2.compute.internal
+          port: 61616
+        - name: amq2
+          scheme: tcp
+          address: ip-11-0-2-002.eu-west-2.compute.internal
+          port: 61616
