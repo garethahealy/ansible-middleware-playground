@@ -39,42 +39,24 @@
       ansible.builtin.command: "{{ artemis_bin }} producer {{ test_amq_producer_args }} --url tcp://{{ amq1.dns }}:61616"
       changed_when: false
 
-    - name: Stop amq1 system.d service
+    - name: Restart amq1 system.d service
       delegate_to: amq1
       become: true
-      throttle: 1
       ansible.builtin.systemd_service:
         name: "amq1"
-        state: stopped
+        state: restarted
 
     - name: Start consumer on amq2
       ansible.builtin.command: "{{ artemis_bin }} consumer {{ test_amq_consumer_args }} --url tcp://{{ amq2.dns }}:61616"
       changed_when: false
 
     # Reset
-    - name: Stop amq2 system.d service
+    - name: Restart amq2 system.d service
       delegate_to: amq2
       become: true
-      throttle: 1
       ansible.builtin.systemd_service:
         name: "amq2"
-        state: stopped
-
-    - name: Start amq1 system.d service
-      delegate_to: amq1
-      become: true
-      throttle: 1
-      ansible.builtin.systemd_service:
-        name: "amq1"
-        state: started
-
-    - name: Start amq2 system.d service
-      delegate_to: amq2
-      become: true
-      throttle: 1
-      ansible.builtin.systemd_service:
-        name: "amq2"
-        state: started
+        state: restarted
 
     - name: Start producer on amq1
       ansible.builtin.command: "{{ artemis_bin }} producer {{ test_amq_producer_args }} --url tcp://{{ amq1.dns }}:61616"

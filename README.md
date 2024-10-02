@@ -89,7 +89,7 @@ ansible-playbook -i inventory/federated.yml playbooks/deploy-amq-federated.yml \
 
 Test federated brokers configuration
 ```bash
-ansible-playbook -i inventory/test.yml playbooks/test-amq-clustered.yml \
+ansible-playbook -i inventory/test.yml playbooks/test-amq-federated.yml \
   -e aws_access_key=${AWS_ACCESS_KEY_ID} \
   -e aws_secret_key=${AWS_SECRET_ACCESS_KEY}
 ```

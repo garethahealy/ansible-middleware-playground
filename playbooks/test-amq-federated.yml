@@ -1,5 +1,5 @@
 ---
-- name: Test AMQ clustered installation
+- name: Test AMQ Federated installation
   hosts: localhost
   gather_facts: false
   roles:
@@ -7,7 +7,7 @@
   tasks:
     ## Scenario:
     # Start a consumer on each broker for 200 messages, a single producer on one of the brokers at random, for 600 messages
-    # All consumers should get 200 each, if they don't, test fails which suggests clustering is not working as expected
+    # All consumers should get 200 each, if they don't, test fails which suggests federation is not working as expected
 
     - name: Set DNSs
       ansible.builtin.set_fact:
