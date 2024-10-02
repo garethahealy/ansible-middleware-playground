@@ -45,10 +45,10 @@
   tags:
     - blank
 
-- name: Template inventory master-slave-test.yml
+- name: Template inventory test.yml
   ansible.builtin.template:
-    src: templates/master-slave-test.j2
-    dest: "{{ playbook_dir }}/../inventory/master-slave-test.yml"
+    src: templates/test.j2
+    dest: "{{ playbook_dir }}/../inventory/test.yml"
     mode: "0755"
   tags:
     - blank

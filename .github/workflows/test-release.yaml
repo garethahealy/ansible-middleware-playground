@@ -84,14 +84,8 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           BOOTSTRAP: ${{ steps.deploy.outputs.bootstrap_dns }}
         run: |
-          export test_inventory=""
-          if [[ "${{ matrix.topology }}" = "master-slave" ]]
-          then
-            test_inventory="-i inventory/master-slave-test.yml"
-          fi
-          
           ssh -i configure-aws/roles/configure_bootstrap/files/ec2_keypair.pem ec2-user@${BOOTSTRAP} "
-            ansible-playbook ${test_inventory} playbooks/test-amq-${{ matrix.topology }}.yml \
+            ansible-playbook -i inventory/test.yml playbooks/test-amq-${{ matrix.topology }}.yml \
               -e aws_access_key=${AWS_ACCESS_KEY_ID} \
               -e aws_secret_key=${AWS_SECRET_ACCESS_KEY}
           "
