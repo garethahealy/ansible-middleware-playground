@@ -32,9 +32,7 @@ jobs:
       - name: Install requirements
         env:
           ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN: ${{ secrets.ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN }}
-        run: |
-          curl https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token -d grant_type=refresh_token -d client_id="cloud-services" -d refresh_token="${ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN}" --fail --silent --show-error --output /dev/null
-          ansible-galaxy install -r requirements.yml
+        run: ansible-galaxy install -r requirements.yml
 
       - name: Run ansible-lint
         uses: ansible/ansible-lint@3b5bee19c2102ea35bc8619795a72c5c73797fc7 # v24

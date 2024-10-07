@@ -1,0 +1,26 @@
+name: "Refresh the ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN token"
+
+on:
+  schedule:
+    - cron:  '0 0 1 * *'
+
+# Declare default permissions as read only.
+permissions: read-all
+
+jobs:
+  token:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
+        with:
+          egress-policy: audit
+
+      - name: Refresh token
+        env:
+          ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN: ${{ secrets.ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN }}
+        run: |
+          curl https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token \
+            -d grant_type=refresh_token -d client_id="cloud-services" \
+            -d refresh_token="${ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN}" \
+            --fail --silent --show-error --output /dev/null
