@@ -6,4 +6,5 @@ collections:
   - name: community.aws
   - name: community.crypto
   - name: redhat.amq_broker
+    source: "https://console.redhat.com/api/automation-hub/content/published/"
     version: "2.2.5"
