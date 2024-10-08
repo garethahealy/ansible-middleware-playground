@@ -3,18 +3,50 @@ name: "Test topologies on release"
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      TOPOLOGIES:
+        description: 'Comma list of topologies to test e.g. clustered,custom,federated,master-slave'
+        default: 'clustered,custom,federated,master-slave'
+        required: true
+        type: string
 
 # Declare default permissions as read only.
 permissions: read-all
 
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
+        with:
+          egress-policy: audit
+
+      - name: Check TOPOLOGIES not empty
+        id: notempty
+        env:
+          TOPOLOGIES_INPUT: "${{ inputs.TOPOLOGIES }}"
+        run: echo "RAW_TOPOLOGIES=${{ env.TOPOLOGIES_INPUT || 'clustered,custom,federated,master-slave' }}" >> $GITHUB_OUTPUT
+
+      - name: Convert comma list to JSON
+        id: strategy
+        env:
+          RAW_TOPOLOGIES: "${{ steps.notempty.outputs.RAW_TOPOLOGIES }}"
+        run: |
+          echo "TOPOLOGIES=$(echo -n "${{ env.RAW_TOPOLOGIES }}" | jq -csR '. | split(",")')" >> $GITHUB_OUTPUT
+
+    outputs:
+      TOPOLOGIES: ${{ steps.strategy.outputs.TOPOLOGIES }}
+
   test_topology:
+    needs: [ validate ]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       max-parallel: 1
       matrix:
-        topology: [ clustered, custom, federated, master-slave ]
+        topology: ${{ fromJson(needs.validate.outputs.TOPOLOGIES) }}
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1

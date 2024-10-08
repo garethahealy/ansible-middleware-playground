@@ -11,9 +11,9 @@
     - redhat.amq_broker.amq_broker_uninstall
 
   post_tasks:
-    - name: Ensure /opt/amq-data/* is empty
+    - name: Ensure mount is empty
       become: true
-      ansible.builtin.shell: rm -rf /opt/amq-data/*
+      ansible.builtin.shell: rm -rf /opt/shared-data/*
       changed_when: false
       retries: 3
       delay: 5
@@ -33,12 +33,12 @@
     - name: Ensure EFS volume is absent
       become: true
       ansible.posix.mount:
-        path: "/opt/amq-data"
+        path: "/opt/shared-data"
         src: "{{ efs_volume.efs[0].filesystem_address }}"
         state: absent
 
     - name: Ensure mount directory doesnt exists
       become: true
       ansible.builtin.file:
-        path: "/opt/amq-data"
+        path: "/opt/shared-data"
         state: absent
