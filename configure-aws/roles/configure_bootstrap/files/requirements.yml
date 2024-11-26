@@ -7,4 +7,4 @@ collections:
   - name: community.crypto
   - name: redhat.amq_broker
     source: "https://console.redhat.com/api/automation-hub/content/published/"
-    version: "2.2.6"
+    version: "2.2.7"
