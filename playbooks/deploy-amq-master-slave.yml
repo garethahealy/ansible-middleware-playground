@@ -31,7 +31,7 @@
           protocols: AMQP
 
   pre_tasks:
-    - name: Install extra packages
+    - name: Install nfs-utils
       become: true
       ansible.builtin.dnf:
         name: "{{ item }}"
@@ -39,23 +39,11 @@
       loop:
         - nfs-utils
 
-    # We need the amq-broker user for the NFS share
-    - name: Create amq-broker service user
+    - name: Start nfs-utils system.d service
       become: true
-      ansible.builtin.user:
-        name: amq-broker
-        home: /opt/amq/
-        system: true
-        create_home: false
-
-    - name: Ensure mount directory exists
-      become: true
-      ansible.builtin.file:
-        path: /opt/shared-data
-        owner: amq-broker
-        group: amq-broker
-        state: directory
-        mode: '0755'
+      ansible.builtin.systemd_service:
+        name: "nfs-utils"
+        state: started
 
     - name: Get EFS volume
       delegate_to: localhost
@@ -76,19 +64,24 @@
         opts: nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport
         state: mounted
 
-  tasks:
-    - name: Deploy
-      block:
-        - name: Deploy AMQ
-          ansible.builtin.import_role:
-            name: redhat.amq_broker.amq_broker
+    - name: Create amq-broker service user
+      become: true
+      ansible.builtin.user:
+        name: amq-broker
+        home: /opt/amq/
+        system: true
+        create_home: false
 
-      rescue:
-        - name: Ensure mount directory ownership is correct
-          become: true
-          ansible.builtin.file:
-            path: /opt/shared-data
-            owner: amq-broker
-            group: amq-broker
-            state: directory
-            mode: '0755'
+    - name: Ensure mount directory permissions correct
+      become: true
+      ansible.builtin.file:
+        path: /opt/shared-data
+        owner: amq-broker
+        group: amq-broker
+        state: directory
+        mode: '0755'
+
+  tasks:
+    - name: Deploy AMQ
+      ansible.builtin.import_role:
+        name: redhat.amq_broker.amq_broker
