@@ -85,18 +85,18 @@ jobs:
           SSH_KEY_VAULT_PASS: ${{ secrets.SSH_KEY_VAULT_PASS }}
         run: |
           pushd configure-aws
-          
+
           echo $SSH_KEY_VAULT_PASS > vault-password.sec
-          
+
           ansible-playbook deploy.yml --skip-tags blank \
             --vault-password-file=vault-password.sec \
             -e SSH_KEY_VAULT_PASS=${SSH_KEY_VAULT_PASS} \
             -e aws_access_key=${AWS_ACCESS_KEY_ID} \
             -e aws_secret_key=${AWS_SECRET_ACCESS_KEY} \
             -e ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN="not-needed"
-          
+
           echo "bootstrap_dns=$(cat inventory/bootstrap.yml | yq '.bootstrap.hosts' | head -c-2)" >> "$GITHUB_OUTPUT"
-          
+
           popd
 
       - name: Deploy ${{ matrix.topology }}
