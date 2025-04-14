@@ -4,7 +4,7 @@
   gather_facts: true
   vars:
     # https://eu-west-2.console.aws.amazon.com/ec2/home?region=eu-west-2#AMICatalog:
-    create_vpc_image_id: "ami-016bc0ffc60455bdf"
+    create_vpc_image_id: "ami-0727cf12519cc2b5b"
   environment:
     SSH_KEY_VAULT_PASS: "{{ SSH_KEY_VAULT_PASS }}"
   roles:
