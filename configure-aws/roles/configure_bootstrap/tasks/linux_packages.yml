@@ -6,7 +6,7 @@
     state: present
   loop:
     - unzip
-    - java-11-openjdk-headless
+    - java-17-openjdk-headless
     - git
 
 - name: Install packages via pip
@@ -15,4 +15,4 @@
   loop:
     - boto3
     - lxml
-    - ansible-core
+    - ansible-core==2.18.7
