@@ -47,6 +47,5 @@
       - dest: "{{ create_vpc_destination_cidr_block }}"
         gateway_id: "{{ create_vpc_igw_result.gateway_id }}"
     state: present
-  register: public_route_table
   tags:
     - blank

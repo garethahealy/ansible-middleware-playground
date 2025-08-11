@@ -7,7 +7,7 @@
 
 - name: Scan for SSH host keys
   ansible.builtin.shell: ssh-keyscan {{ create_vpc_bootstrap_public_dns_name }} 2>/dev/null
-  register: ssh_scan
+  register: create_vpc_ssh_scan
   changed_when: false
 
 - name: Create ~/.ssh
@@ -25,7 +25,7 @@
 - name: Update known_hosts
   ansible.builtin.known_hosts:
     name: "{{ create_vpc_bootstrap_public_dns_name }}"
-    key: "{{ ssh_scan.stdout }}"
+    key: "{{ create_vpc_ssh_scan.stdout }}"
 
 - name: Check bootstrap is pingable
   ansible.builtin.ping:
