@@ -7,14 +7,14 @@
     filters:
       instance-state-name: ["running"]
       "tag:Name": "amq*"
-  register: amq_nodes
+  register: test_amq_amq_nodes
 
 - name: Create private_dns_names
   ansible.builtin.set_fact:
-    private_dns_names: []
+    test_amq_private_dns_names: []
 
 - name: Set AMQ nodes private_dns_names
   ansible.builtin.set_fact:
-    private_dns_names: "{{ private_dns_names + [{'name': item.tags.Name, 'dns': item.network_interfaces[0].private_dns_name}] }}"
-  loop: "{{ amq_nodes.instances }}"
+    test_amq_private_dns_names: "{{ test_amq_private_dns_names + [{'name': item.tags.Name, 'dns': item.network_interfaces[0].private_dns_name}] }}"
+  loop: "{{ test_amq_amq_nodes.instances }}"
   no_log: true

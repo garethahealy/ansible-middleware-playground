@@ -1,7 +1,7 @@
 ---
 all:
   hosts:
-{% for node in private_dns_names %}
+{% for node in create_vpc_private_dns_names %}
     {{ node.dns }}:
       amq_broker_instance_name: {{ node.name }}
 {% endfor %}

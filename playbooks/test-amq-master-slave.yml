@@ -16,27 +16,27 @@
 
     - name: Set DNSs
       ansible.builtin.set_fact:
-        amq1: "{{ private_dns_names | selectattr('name', 'equalto', 'amq1') | first }}"
-        amq2: "{{ private_dns_names | selectattr('name', 'equalto', 'amq2') | first }}"
+        amq1: "{{ test_amq_private_dns_names | selectattr('name', 'equalto', 'amq1') | first }}"
+        amq2: "{{ test_amq_private_dns_names | selectattr('name', 'equalto', 'amq2') | first }}"
 
     # Validate
     - name: Start producer on amq1 to validate
-      ansible.builtin.command: "{{ artemis_bin }} producer {{ test_amq_producer_args }} --url tcp://{{ amq1.dns }}:61616"
+      ansible.builtin.command: "{{ test_amq_artemis_bin }} producer {{ test_amq_producer_args }} --url tcp://{{ amq1.dns }}:61616"
       changed_when: false
 
     - name: Start consumer on amq1 to validate
-      ansible.builtin.command: "{{ artemis_bin }} consumer {{ test_amq_consumer_args }} --url tcp://{{ amq1.dns }}:61616"
+      ansible.builtin.command: "{{ test_amq_artemis_bin }} consumer {{ test_amq_consumer_args }} --url tcp://{{ amq1.dns }}:61616"
       changed_when: false
 
     - name: Start producer on amq2
-      ansible.builtin.command: "{{ artemis_bin }} producer {{ test_amq_producer_args }} --url tcp://{{ amq2.dns }}:61616"
+      ansible.builtin.command: "{{ test_amq_artemis_bin }} producer {{ test_amq_producer_args }} --url tcp://{{ amq2.dns }}:61616"
       changed_when: false
       register: amq2_result
       failed_when: "'Connection failed' not in amq2_result.stderr"
 
     # Test
     - name: Start producer on amq1 to test
-      ansible.builtin.command: "{{ artemis_bin }} producer {{ test_amq_producer_args }} --url tcp://{{ amq1.dns }}:61616"
+      ansible.builtin.command: "{{ test_amq_artemis_bin }} producer {{ test_amq_producer_args }} --url tcp://{{ amq1.dns }}:61616"
       changed_when: false
 
     - name: Restart amq1 system.d service
@@ -47,7 +47,7 @@
         state: restarted
 
     - name: Start consumer on amq2
-      ansible.builtin.command: "{{ artemis_bin }} consumer {{ test_amq_consumer_args }} --url tcp://{{ amq2.dns }}:61616"
+      ansible.builtin.command: "{{ test_amq_artemis_bin }} consumer {{ test_amq_consumer_args }} --url tcp://{{ amq2.dns }}:61616"
       changed_when: false
 
     # Reset
@@ -59,9 +59,9 @@
         state: restarted
 
     - name: Start producer on amq1 after reset
-      ansible.builtin.command: "{{ artemis_bin }} producer {{ test_amq_producer_args }} --url tcp://{{ amq1.dns }}:61616"
+      ansible.builtin.command: "{{ test_amq_artemis_bin }} producer {{ test_amq_producer_args }} --url tcp://{{ amq1.dns }}:61616"
       changed_when: false
 
     - name: Start consumer on amq1 after reset
-      ansible.builtin.command: "{{ artemis_bin }} consumer {{ test_amq_consumer_args }} --url tcp://{{ amq1.dns }}:61616"
+      ansible.builtin.command: "{{ test_amq_artemis_bin }} consumer {{ test_amq_consumer_args }} --url tcp://{{ amq1.dns }}:61616"
       changed_when: false

@@ -11,17 +11,17 @@
 
     - name: Set DNSs
       ansible.builtin.set_fact:
-        amq1: "{{ private_dns_names | selectattr('name', 'equalto', 'amq1') | first }}"
+        amq1: "{{ test_amq_private_dns_names | selectattr('name', 'equalto', 'amq1') | first }}"
 
     - name: Start consumer
-      ansible.builtin.command: "{{ artemis_bin }} consumer {{ test_amq_consumer_args }} --url tcp://{{ amq1.dns }}:61616"
+      ansible.builtin.command: "{{ test_amq_artemis_bin }} consumer {{ test_amq_consumer_args }} --url tcp://{{ amq1.dns }}:61616"
       poll: 0
       async: 60
       changed_when: false
       register: amq1_consumer
 
     - name: Start producer
-      ansible.builtin.command: "{{ artemis_bin }} producer {{ test_amq_producer_args }} --url tcp://{{ amq1.dns }}:61616"
+      ansible.builtin.command: "{{ test_amq_artemis_bin }} producer {{ test_amq_producer_args }} --url tcp://{{ amq1.dns }}:61616"
       changed_when: false
 
     - name: Wait for consumers to end

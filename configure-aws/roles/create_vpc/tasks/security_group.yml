@@ -6,7 +6,7 @@
 - name: Create Security Group
   amazon.aws.ec2_security_group:
     region: "{{ create_vpc_region }}"
-    vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+    vpc_id: "{{ create_vpc_ec2_vpc_net_result.vpc.id }}"
     name: "{{ create_vpc_security_group_name }}"
     description: "{{ create_vpc_security_group_name }}"
     purge_rules: false
@@ -44,4 +44,4 @@
         rule_desc: allow EFS traffic within VPC
         cidr_ip: "{{ create_vpc_subnet_cidr_block }}"
     state: present
-  register: security_group_results
+  register: create_vpc_security_group_results

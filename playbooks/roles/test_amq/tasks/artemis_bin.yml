@@ -16,4 +16,4 @@
 
 - name: Set artemis_bin fact
   ansible.builtin.set_fact:
-    artemis_bin: "{{ test_amq_artemis_bin_glob | fileglob | first }}"
+    test_amq_artemis_bin: "{{ test_amq_artemis_bin_glob | fileglob | first }}"

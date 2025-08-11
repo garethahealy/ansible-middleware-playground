@@ -8,44 +8,44 @@
     dns_hostnames: true
     tenancy: default
     state: present
-  register: ec2_vpc_net_result
+  register: create_vpc_ec2_vpc_net_result
 
 - name: Create Internet Gateway for VPC
   amazon.aws.ec2_vpc_igw:
     region: "{{ create_vpc_region }}"
-    vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+    vpc_id: "{{ create_vpc_ec2_vpc_net_result.vpc.id }}"
     tags:
       Name: "{{ create_vpc_igw_name }}"
     state: present
-  register: igw_result
+  register: create_vpc_igw_result
   tags:
     - blank
 
 - name: Create VPC Subnet
   amazon.aws.ec2_vpc_subnet:
     region: "{{ create_vpc_region }}"
-    vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+    vpc_id: "{{ create_vpc_ec2_vpc_net_result.vpc.id }}"
     az: "{{ create_vpc_zone }}"
     cidr: "{{ create_vpc_subnet_cidr_block }}"
     map_public: true
     resource_tags:
       Name: "{{ create_vpc_subnet_name }}"
     state: present
-  register: subnet_result
+  register: create_vpc_subnet_result
   tags:
     - blank
 
 - name: Create VPC Public Subnet Route Table
   amazon.aws.ec2_vpc_route_table:
     region: "{{ create_vpc_region }}"
-    vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+    vpc_id: "{{ create_vpc_ec2_vpc_net_result.vpc.id }}"
     tags:
       Name: "{{ create_vpc_route_table_name }}"
     subnets:
-      - "{{ subnet_result.subnet.id }}"
+      - "{{ create_vpc_subnet_result.subnet.id }}"
     routes:
       - dest: "{{ create_vpc_destination_cidr_block }}"
-        gateway_id: "{{ igw_result.gateway_id }}"
+        gateway_id: "{{ create_vpc_igw_result.gateway_id }}"
     state: present
   register: public_route_table
   tags:

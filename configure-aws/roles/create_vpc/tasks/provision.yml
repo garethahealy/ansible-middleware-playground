@@ -6,10 +6,10 @@
     image_id: "{{ create_vpc_image_id }}"
     instance_type: "{{ create_vpc_instance_type }}"
     key_name: "{{ ansible_hostname }}_keypair"
-    vpc_subnet_id: "{{ subnet_result.subnet.id }}"
+    vpc_subnet_id: "{{ create_vpc_subnet_result.subnet.id }}"
     network_interfaces:
       - assign_public_ip: true
-    security_group: "{{ security_group_results.group_id }}"
+    security_group: "{{ create_vpc_security_group_results.group_id }}"
     wait: true
     state: started
 
@@ -20,10 +20,10 @@
     image_id: "{{ create_vpc_image_id }}"
     instance_type: "{{ create_vpc_instance_type }}"
     key_name: "{{ ansible_hostname }}_keypair"
-    vpc_subnet_id: "{{ subnet_result.subnet.id }}"
+    vpc_subnet_id: "{{ create_vpc_subnet_result.subnet.id }}"
     network_interfaces:
       - assign_public_ip: true
-    security_group: "{{ security_group_results.group_id }}"
+    security_group: "{{ create_vpc_security_group_results.group_id }}"
     wait: true
     state: running
   loop: "{{ create_vpc_instances }}"

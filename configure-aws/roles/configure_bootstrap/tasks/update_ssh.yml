@@ -7,27 +7,27 @@
     filters:
       instance-state-name: ["running"]
       "tag:Name": "amq*"
-  register: ec2_node_info
+  register: configure_bootstrap_ec2_node_info
 
 - name: Create empty private_dns_names collection
   ansible.builtin.set_fact:
-    private_dns_names: []
+    configure_bootstrap_private_dns_names: []
 
 - name: Add DNS names to private_dns_names collection
   ansible.builtin.set_fact:
-    private_dns_names: "{{ private_dns_names + [item.network_interfaces[0].private_dns_name] }}"
-  loop: "{{ ec2_node_info.instances }}"
+    configure_bootstrap_private_dns_names: "{{ configure_bootstrap_private_dns_names + [item.network_interfaces[0].private_dns_name] }}"
+  loop: "{{ configure_bootstrap_ec2_node_info.instances }}"
   no_log: true
 
 - name: Scan for SSH host keys
   ansible.builtin.shell: ssh-keyscan {{ item }} 2>/dev/null
-  register: ssh_scan
-  loop: "{{ private_dns_names }}"
+  register: configure_bootstrap_ssh_scan
+  loop: "{{ configure_bootstrap_private_dns_names }}"
   changed_when: false
 
 - name: Update known_hosts
   ansible.builtin.known_hosts:
     name: "{{ item.item }}"
     key: "{{ item.stdout }}"
-  loop: "{{ ssh_scan.results }}"
+  loop: "{{ configure_bootstrap_ssh_scan.results }}"
   no_log: true

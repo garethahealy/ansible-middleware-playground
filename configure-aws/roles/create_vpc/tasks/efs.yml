@@ -6,7 +6,7 @@
     tags:
       Name: amq-data
     targets:
-      - subnet_id: "{{ subnet_result.subnet.id }}"
+      - subnet_id: "{{ create_vpc_subnet_result.subnet.id }}"
         security_groups:
-          - "{{ security_group_results.group_id }}"
+          - "{{ create_vpc_security_group_results.group_id }}"
     state: present
