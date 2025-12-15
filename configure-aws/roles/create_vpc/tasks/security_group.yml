@@ -16,12 +16,12 @@
       - proto: tcp
         from_port: 22
         to_port: 22
-        rule_desc: allow SSH traffic from {{ ansible_hostname }}
+        rule_desc: allow SSH traffic from {{ ansible_facts['hostname'] }}
         cidr_ip: "{{ create_vpc_ip_output.ansible_facts.ipify_public_ip }}/32"
       - proto: tcp
         from_port: 8161
         to_port: 8161
-        rule_desc: allow AMQ Console traffic from {{ ansible_hostname }}
+        rule_desc: allow AMQ Console traffic from {{ ansible_facts['hostname'] }}
         cidr_ip: "{{ create_vpc_ip_output.ansible_facts.ipify_public_ip }}/32"
       - proto: tcp
         from_port: 22

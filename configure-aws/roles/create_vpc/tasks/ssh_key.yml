@@ -2,7 +2,7 @@
 - name: Create a new EC2 key pair
   amazon.aws.ec2_key:
     region: "{{ create_vpc_region }}"
-    name: "{{ ansible_hostname }}_keypair"
+    name: "{{ ansible_facts['hostname'] }}_keypair"
     file_name: "{{ create_vpc_ec2_keypair }}"
     force: true
     state: present
