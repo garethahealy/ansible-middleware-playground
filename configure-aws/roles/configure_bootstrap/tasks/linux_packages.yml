@@ -8,6 +8,7 @@
     - unzip
     - java-17-openjdk-headless
     - git
+    - make
 
 - name: Install packages via pip
   ansible.builtin.pip:
@@ -16,4 +17,4 @@
   loop:
     - boto3
     - lxml
-    - ansible-core==2.18.7
+    - ansible-core==2.18.12

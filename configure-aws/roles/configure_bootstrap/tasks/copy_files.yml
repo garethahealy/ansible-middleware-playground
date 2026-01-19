@@ -7,6 +7,7 @@
   loop:
     - "{{ playbook_dir }}/../inventory"
     - "{{ playbook_dir }}/../playbooks"
+    - "{{ playbook_dir }}/../Makefile"
     - "{{ playbook_dir }}/../scripts/move-to-upstream.sh"
 
 - name: Copy ec2_keypair.pem to bootstrap
