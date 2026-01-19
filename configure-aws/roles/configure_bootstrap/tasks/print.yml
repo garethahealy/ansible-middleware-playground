@@ -1,8 +1,7 @@
 ---
 - name: Get Bootstrap node
+  delegate_to: localhost
   amazon.aws.ec2_instance_info:
-    aws_access_key: "{{ aws_access_key }}"
-    aws_secret_key: "{{ aws_secret_key }}"
     region: "{{ configure_bootstrap_region }}"
     filters:
       instance-state-name: ["running"]

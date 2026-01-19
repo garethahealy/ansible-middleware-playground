@@ -22,7 +22,7 @@ export RHN_USERNAME="replace_me"
 export RHN_PASSWORD="replace_me"
 ```
 
-Set your AWS credentials
+Set your AWS credentials (env vars or profile)
 ```bash
 export AWS_ACCESS_KEY_ID="replace_me"
 export AWS_SECRET_ACCESS_KEY="replace_me"
@@ -39,9 +39,7 @@ ansible-playbook -i inventory/custom.yml playbooks/deploy-amq-custom.yml \
 
 Test single broker configuration
 ```bash
-ansible-playbook -i inventory/test.yml playbooks/test-amq-custom.yml \
-  -e aws_access_key=${AWS_ACCESS_KEY_ID} \
-  -e aws_secret_key=${AWS_SECRET_ACCESS_KEY}
+ansible-playbook -i inventory/test.yml playbooks/test-amq-custom.yml
 ```
 
 ## Master/Slave Broker
@@ -50,16 +48,12 @@ Deploy master/slave broker, with shared storage
 ```bash
 ansible-playbook -i inventory/master-slave.yml playbooks/deploy-amq-master-slave.yml \
   -e rhn_username=${RHN_USERNAME} \
-  -e rhn_password=${RHN_PASSWORD} \
-  -e aws_access_key=${AWS_ACCESS_KEY_ID} \
-  -e aws_secret_key=${AWS_SECRET_ACCESS_KEY}
+  -e rhn_password=${RHN_PASSWORD}
 ```
 
 Test master/slave broker configuration
 ```bash
-ansible-playbook -i inventory/test.yml playbooks/test-amq-master-slave.yml \
-  -e aws_access_key=${AWS_ACCESS_KEY_ID} \
-  -e aws_secret_key=${AWS_SECRET_ACCESS_KEY}
+ansible-playbook -i inventory/test.yml playbooks/test-amq-master-slave.yml
 ```
 
 ## 3 Clustered Brokers
@@ -73,9 +67,7 @@ ansible-playbook -i inventory/clustered.yml playbooks/deploy-amq-clustered.yml \
 
 Test clustered brokers configuration
 ```bash
-ansible-playbook -i inventory/test.yml playbooks/test-amq-clustered.yml \
-  -e aws_access_key=${AWS_ACCESS_KEY_ID} \
-  -e aws_secret_key=${AWS_SECRET_ACCESS_KEY}
+ansible-playbook -i inventory/test.yml playbooks/test-amq-clustered.yml
 ```
 
 ## 3 Federated Brokers
@@ -89,15 +81,11 @@ ansible-playbook -i inventory/federated.yml playbooks/deploy-amq-federated.yml \
 
 Test federated brokers configuration
 ```bash
-ansible-playbook -i inventory/test.yml playbooks/test-amq-federated.yml \
-  -e aws_access_key=${AWS_ACCESS_KEY_ID} \
-  -e aws_secret_key=${AWS_SECRET_ACCESS_KEY}
+ansible-playbook -i inventory/test.yml playbooks/test-amq-federated.yml
 ```
 
 ## Remove an installation
 
 ```bash
-ansible-playbook -i inventory/all.yml playbooks/remove-amq.yml \
-  -e aws_access_key=${AWS_ACCESS_KEY_ID} \
-  -e aws_secret_key=${AWS_SECRET_ACCESS_KEY}
+ansible-playbook -i inventory/all.yml playbooks/remove-amq.yml
 ```

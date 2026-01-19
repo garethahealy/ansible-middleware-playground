@@ -6,13 +6,13 @@ If you don't already have any infrastructure, the playbooks here can provide you
 
 ## Instructions
 
-Set your AWS credentials
+Set your AWS credentials (env vars or profile)
 ```bash
 export AWS_ACCESS_KEY_ID="replace_me"
 export AWS_SECRET_ACCESS_KEY="replace_me"
 ```
 
-Get a Automation Hub token from https://console.redhat.com/ansible/automation-hub/token
+Get an Automation Hub token from https://console.redhat.com/ansible/automation-hub/token
 ```bash
 export ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN="replace_me"
 ```
@@ -22,8 +22,6 @@ Deploy the AWS infrastructure (_run from local_)
 ansible-playbook deploy.yml \
   --vault-password-file=vault-password.sec \
   -e SSH_KEY_VAULT_PASS=${SSH_KEY_VAULT_PASS} \
-  -e aws_access_key=${AWS_ACCESS_KEY_ID} \
-  -e aws_secret_key=${AWS_SECRET_ACCESS_KEY} \
   -e ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN=${ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN}
 ```
 
