@@ -3,22 +3,27 @@
   hosts: all
   gather_facts: true
   vars:
-    # SSH key
-    ansible_ssh_private_key_file: ec2_keypair.pem
     # AWS
     region: "eu-west-2"
   roles:
     - redhat.amq_broker.amq_broker_uninstall
 
   post_tasks:
-    - name: Ensure mount is empty
+    - name: Find files under shared data mount
       become: true
-      ansible.builtin.shell: rm -rf /opt/shared-data/*
-      changed_when: false
-      retries: 3
-      delay: 5
-      register: result
-      until: result.rc == 0
+      ansible.builtin.find:
+        paths: "/opt/shared-data"
+        recurse: true
+        file_type: any
+      register: shared_data_files
+
+    - name: Remove files under shared data mount
+      become: true
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ shared_data_files.files }}"
+      when: shared_data_files.matched | int > 0
 
     - name: Get EFS volume
       delegate_to: localhost
