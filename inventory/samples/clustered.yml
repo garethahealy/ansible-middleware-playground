@@ -1,5 +1,7 @@
 ---
 clustered:
+  vars:
+    ansible_ssh_private_key_file: ec2_keypair.pem
   hosts:
     ip-11-0-1-001.eu-west-2.compute.internal:
       amq_broker_instance_name: amq1

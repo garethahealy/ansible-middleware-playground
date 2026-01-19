@@ -1,5 +1,7 @@
 ---
 amq1:
+  vars:
+    ansible_ssh_private_key_file: ec2_keypair.pem
   hosts:
 {% for node in create_vpc_private_dns_names %}
 {% if node.name == "amq1" %}
