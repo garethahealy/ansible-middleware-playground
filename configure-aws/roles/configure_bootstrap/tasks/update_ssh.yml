@@ -19,7 +19,7 @@
   no_log: true
 
 - name: Scan for SSH host keys
-  ansible.builtin.shell: ssh-keyscan {{ item }} 2>/dev/null
+  ansible.builtin.shell: ssh-keyscan -t ecdsa {{ item }} 2>/dev/null
   register: configure_bootstrap_ssh_scan
   loop: "{{ configure_bootstrap_private_dns_names }}"
   changed_when: false
