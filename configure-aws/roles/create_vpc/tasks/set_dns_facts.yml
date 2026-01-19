@@ -34,3 +34,17 @@
 - name: Sort private_dns_names
   ansible.builtin.set_fact:
     create_vpc_private_dns_names: "{{ create_vpc_private_dns_names_unsorted | sort(attribute='name') }}"
+
+- name: Create public_dns_names
+  ansible.builtin.set_fact:
+    create_vpc_public_dns_names_unsorted: []
+
+- name: Set AMQ nodes private_dns_names
+  ansible.builtin.set_fact:
+    create_vpc_public_dns_names_unsorted: "{{ create_vpc_public_dns_names_unsorted + [{'name': item.tags.Name, 'dns': item.network_interfaces[0].association.public_dns_name}] }}"
+  loop: "{{ create_vpc_amq_nodes.instances }}"
+  no_log: true
+
+- name: Sort private_dns_names
+  ansible.builtin.set_fact:
+    create_vpc_public_dns_names: "{{ create_vpc_public_dns_names_unsorted | sort(attribute='name') }}"

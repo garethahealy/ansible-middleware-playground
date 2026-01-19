@@ -1,0 +1,51 @@
+---
+- name: Add bootstrap host to in-memory inventory
+  ansible.builtin.add_host:
+    hostname: "{{ create_vpc_bootstrap_public_dns_name }}"
+    groups:
+      - bootstrap
+
+- name: Add AMQ hosts to in-memory inventory
+  ansible.builtin.add_host:
+    hostname: "{{ item.dns }}"
+    groups:
+      - all
+  loop: "{{ create_vpc_public_dns_names }}"
+
+- name: Create ~/.ssh
+  ansible.builtin.file:
+    path: ~/.ssh
+    state: directory
+    mode: "0700"
+
+- name: Touch ~/.ssh/known_hosts
+  ansible.builtin.file:
+    path: ~/.ssh/known_hosts
+    mode: "0755"
+    state: touch
+
+- name: Scan SSH bootstrap host key
+  ansible.builtin.shell: ssh-keyscan -t ecdsa {{ create_vpc_bootstrap_public_dns_name }} 2>/dev/null
+  register: create_vpc_ssh_scan
+  changed_when: false
+
+- name: Update known_hosts for bootstrap
+  ansible.builtin.known_hosts:
+    name: "{{ create_vpc_bootstrap_public_dns_name }}"
+    key: "{{ create_vpc_ssh_scan.stdout }}"
+
+- name: Scan SSH AMQ hosts keys
+  ansible.builtin.shell: ssh-keyscan -t ecdsa {{ item.dns }} 2>/dev/null
+  register: configure_amq_ssh_scan
+  loop: "{{ create_vpc_public_dns_names }}"
+  changed_when: false
+
+- name: Update known_hosts for AMQ hosts
+  ansible.builtin.known_hosts:
+    name: "{{ item.item.dns }}"
+    key: "{{ item.stdout }}"
+  loop: "{{ configure_amq_ssh_scan.results }}"
+  no_log: true
+
+- name: Check bootstrap is pingable
+  ansible.builtin.ping:

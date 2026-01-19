@@ -35,4 +35,4 @@
   ansible.builtin.include_tasks: template_inventory.yml
 
 - name: Update local SSH config for bootstrap
-  ansible.builtin.include_tasks: ssh_bootstrap.yml
+  ansible.builtin.include_tasks: ssh_for_hosts.yml

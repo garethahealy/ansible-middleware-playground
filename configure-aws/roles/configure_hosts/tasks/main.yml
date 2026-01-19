@@ -1,0 +1,6 @@
+---
+- name: Install Linux packages
+  ansible.builtin.include_tasks: linux_packages.yml
+
+- name: Configure ansible
+  ansible.builtin.include_tasks: ansible_config.yml

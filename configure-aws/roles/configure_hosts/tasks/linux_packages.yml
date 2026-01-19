@@ -1,4 +1,11 @@
 ---
+- name: Upgrade all packages
+  become: true
+  ansible.builtin.dnf:
+    name: "*"
+    state: latest
+    update_cache: true
+
 - name: Install packages via dnf
   become: true
   ansible.builtin.dnf:

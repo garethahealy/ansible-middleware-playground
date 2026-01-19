@@ -12,6 +12,7 @@
 - name: Install packages via pip
   ansible.builtin.pip:
     name: "{{ item }}"
+    executable: "/usr/bin/pip3.11"
   loop:
     - boto3
     - lxml

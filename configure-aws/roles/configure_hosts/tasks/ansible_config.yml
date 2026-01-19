@@ -1,0 +1,7 @@
+---
+- name: Copy ansible.cfg
+  become: true
+  ansible.builtin.copy:
+    src: files/ansible.cfg
+    dest: /home/ec2-user/.ansible.cfg
+    mode: "0755"

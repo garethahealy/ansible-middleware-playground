@@ -12,15 +12,15 @@
       role: "create_vpc"
 
 # Python 3.9 comes with the AMIs, we need 3.11 so needs to be included before being used in the configure_bootstrap role
-- name: Configure python on bootstrap box
-  hosts: bootstrap
+- name: Configure python on host boxes
+  hosts: all
   remote_user: ec2-user
   gather_facts: true
   vars:
     ansible_ssh_private_key_file: roles/configure_bootstrap/files/ec2_keypair.pem
   roles:
-    - name: "Configure bootstrap with latest python"
-      role: "configure_bootstrap_python"
+    - name: "Configure hosts with latest python"
+      role: "configure_hosts"
   tags:
     - blank
 
@@ -30,7 +30,6 @@
   gather_facts: true
   vars:
     ansible_ssh_private_key_file: roles/configure_bootstrap/files/ec2_keypair.pem
-    ansible_python_interpreter: /usr/bin/python3.11
   environment:
     ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN: "{{ ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN }}"
   roles:

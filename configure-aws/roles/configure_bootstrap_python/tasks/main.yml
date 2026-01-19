@@ -1,3 +1,0 @@
----
-- name: Install linux packages
-  ansible.builtin.include_tasks: linux_packages.yml
