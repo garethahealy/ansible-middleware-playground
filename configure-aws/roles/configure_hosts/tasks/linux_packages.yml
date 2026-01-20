@@ -3,7 +3,7 @@
   become: true
   ansible.builtin.dnf:
     name: "*"
-    state: latest
+    state: latest # noqa package-latest
     update_cache: true
 
 - name: Install packages via dnf

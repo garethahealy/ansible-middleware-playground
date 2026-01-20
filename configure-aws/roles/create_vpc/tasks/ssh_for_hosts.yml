@@ -36,7 +36,7 @@
 
 - name: Scan SSH AMQ hosts keys
   ansible.builtin.shell: ssh-keyscan -t ecdsa {{ item.dns }} 2>/dev/null
-  register: configure_amq_ssh_scan
+  register: create_vpc_amq_ssh_scan
   loop: "{{ create_vpc_public_dns_names }}"
   changed_when: false
 
@@ -44,7 +44,7 @@
   ansible.builtin.known_hosts:
     name: "{{ item.item.dns }}"
     key: "{{ item.stdout }}"
-  loop: "{{ configure_amq_ssh_scan.results }}"
+  loop: "{{ create_vpc_amq_ssh_scan.results }}"
   no_log: true
 
 - name: Check bootstrap is pingable
