@@ -3,7 +3,7 @@ SHELL := /bin/bash
 .PHONY: help configure-aws \
 	deploy-custom deploy-clustered deploy-federated deploy-master-slave \
 	test-custom test-clustered test-federated test-master-slave \
-	remove
+	remove cleanup
 
 help:
 	@echo "Available targets:"
@@ -17,6 +17,7 @@ help:
 	@echo "  test-federated        Test federated brokers"
 	@echo "  test-master-slave     Test master/slave brokers"
 	@echo "  remove                Remove AMQ installations"
+	@echo "  cleanup               Clean up generated files and keys"
 
 configure-aws:
 	ansible-playbook configure-aws/deploy.yml \
@@ -58,3 +59,6 @@ test-master-slave:
 
 remove:
 	ansible-playbook -i inventory/all.yml playbooks/remove-amq.yml
+
+cleanup:
+	./scripts/cleanup.sh
