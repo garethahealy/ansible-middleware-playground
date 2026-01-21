@@ -27,7 +27,7 @@
 
 - name: Set AMQ nodes private_dns_names
   ansible.builtin.set_fact:
-    create_vpc_private_dns_names_unsorted: "{{ create_vpc_private_dns_names_unsorted + [{'name': item.tags.Name, 'dns': item.network_interfaces[0].private_dns_name}] }}"
+    create_vpc_private_dns_names_unsorted: "{{ create_vpc_private_dns_names_unsorted + [{'name': item.tags.Name, 'dns': item.network_interfaces[0].private_dns_name}] }}" # noqa yaml[line-length]
   loop: "{{ create_vpc_amq_nodes.instances }}"
   no_log: true
 
