@@ -4,6 +4,13 @@
     "config:best-practices",
     "schedule:earlyMondays"
   ],
+  "timezone": "Etc/UTC",
+  "enabledManagers": [
+    "ansible-galaxy",
+    "github-actions",
+    "pip_requirements",
+    "pre-commit"
+  ],
   "packageRules": [
     {
       "matchManagers": [
