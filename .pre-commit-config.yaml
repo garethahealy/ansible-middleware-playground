@@ -8,6 +8,15 @@ repos:
       - id: check-json
       - id: end-of-file-fixer
       - id: trailing-whitespace
+  - repo: https://github.com/ansible/ansible-lint
+    rev: v26.1.1
+    hooks:
+      - id: ansible-lint
+  - repo: https://github.com/renovatebot/pre-commit-hooks
+    rev: 42.84.0
+    hooks:
+      - id: renovate-config-validator
+        args: [ --strict ]
   - repo: https://gitlab.cee.redhat.com/infosec-public/developer-workbench/tools.git
     rev: rh-pre-commit-2.3.2
     hooks:
@@ -17,7 +26,3 @@ repos:
       # Docs: https://source.redhat.com/departments/it/it-information-security/leaktk/leaktk_components/rh_pre_commit
       - id: rh-pre-commit
       - id: rh-pre-commit.commit-msg # Optional for commit-msg attestation
-#  - repo: https://github.com/ansible/ansible-lint
-#    rev: v26.1.1
-#    hooks:
-#      - id: ansible-lint
