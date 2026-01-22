@@ -6,6 +6,8 @@ scripts/_creds.sh
 scripts/_creds_update_aws_secrets.sh
 configure-aws/roles/configure_bootstrap/files/*.pem
 configure-aws/roles/configure_bootstrap/files/*.pub
+
+configure-aws/vault-password.sec
 vault-password.sec
 
 inventory/*.yml

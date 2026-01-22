@@ -1,2 +1,5 @@
 scripts/_creds.sh
 scripts/_creds_update_aws_secrets.sh
+
+configure-aws/vault-password.sec
+vault-password.sec

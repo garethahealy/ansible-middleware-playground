@@ -1,7 +1,7 @@
 ---
 - name: Decrypt ec2_keypair.pem.enc
   ansible.builtin.copy:
-    content: "{{ lookup('ansible.builtin.file', create_vpc_ec2_keypair ~ '.enc') | ansible.builtin.vault(SSH_KEY_VAULT_PASS) }}"
+    content: "{{ lookup('ansible.builtin.file', create_vpc_ec2_keypair ~ '.enc') }}"
     dest: "{{ create_vpc_ec2_keypair }}"
     decrypt: true
     mode: "0400"

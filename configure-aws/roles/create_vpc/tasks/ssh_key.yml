@@ -12,11 +12,6 @@
     path: "{{ create_vpc_ec2_keypair }}"
     mode: "0400"
 
-- name: Generate an OpenSSL public key in PEM format
-  community.crypto.openssl_publickey:
-    path: "{{ playbook_dir }}/roles/configure_bootstrap/files/ec2_keypair.pub"
-    privatekey_path: "{{ create_vpc_ec2_keypair }}"
-
 - name: Encrypt ec2_keypair.pem
   ansible.builtin.copy:
     content: "{{ lookup('ansible.builtin.file', create_vpc_ec2_keypair) | ansible.builtin.vault(SSH_KEY_VAULT_PASS) }}"

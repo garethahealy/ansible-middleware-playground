@@ -87,6 +87,7 @@ jobs:
           pushd configure-aws
 
           echo $SSH_KEY_VAULT_PASS > vault-password.sec
+          chmod 600 vault-password.sec
 
           ansible-playbook deploy.yml --skip-tags blank \
             --vault-password-file=vault-password.sec \
