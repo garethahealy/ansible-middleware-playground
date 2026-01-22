@@ -1,0 +1,34 @@
+---
+- name: Set AWS env as facts
+  delegate_to: localhost
+  ansible.builtin.set_fact:
+    configure_bootstrap_aws_access_key_id: "{{ lookup('ansible.builtin.env', 'AWS_ACCESS_KEY_ID') }}"
+    configure_bootstrap_aws_secret_access_key: "{{ lookup('ansible.builtin.env', 'AWS_SECRET_ACCESS_KEY') }}"
+
+- name: Ensure ~/.aws directory exists
+  ansible.builtin.file:
+    path: ~/.aws
+    state: directory
+    mode: "0700"
+
+- name: Write AWS credentials
+  ansible.builtin.copy:
+    dest: ~/.aws/credentials
+    mode: "0600"
+    content: |
+      [default]
+      aws_access_key_id={{ configure_bootstrap_aws_access_key_id }}
+      aws_secret_access_key={{ configure_bootstrap_aws_secret_access_key }}
+  no_log: true
+
+- name: Write AWS config
+  ansible.builtin.copy:
+    dest: ~/.aws/config
+    mode: "0600"
+    content: |
+      [default]
+      region={{ aws_region | default('eu-west-2') }}
+      output={{ aws_output_format | default('json') }}
+
+- name: Get the current caller identity information
+  amazon.aws.aws_caller_info:

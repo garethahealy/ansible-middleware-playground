@@ -9,6 +9,7 @@
     - java-17-openjdk-headless
     - git
     - make
+    - awscli2
 
 - name: Install packages via pip
   ansible.builtin.pip:

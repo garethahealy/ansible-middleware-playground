@@ -92,8 +92,6 @@ jobs:
           ansible-playbook deploy.yml --skip-tags blank \
             --vault-password-file=vault-password.sec \
             -e SSH_KEY_VAULT_PASS=${SSH_KEY_VAULT_PASS} \
-            -e aws_access_key=${AWS_ACCESS_KEY_ID} \
-            -e aws_secret_key=${AWS_SECRET_ACCESS_KEY} \
             -e ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN="not-needed"
 
           echo "bootstrap_dns=$(cat inventory/bootstrap.yml | yq '.bootstrap.hosts' | head -c-2)" >> "$GITHUB_OUTPUT"
@@ -104,39 +102,31 @@ jobs:
         env:
           RHN_USERNAME: ${{ secrets.RHN_USERNAME }}
           RHN_PASSWORD: ${{ secrets.RHN_PASSWORD }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           BOOTSTRAP: ${{ steps.deploy.outputs.bootstrap_dns }}
         run: |
           ssh -i configure-aws/roles/configure_bootstrap/files/ec2_keypair.pem ec2-user@${BOOTSTRAP} "
             ansible-playbook -i inventory/${{ matrix.topology }}.yml playbooks/deploy-amq-${{ matrix.topology }}.yml \
               -e rhn_username=${RHN_USERNAME} \
-              -e rhn_password=${RHN_PASSWORD} \
-              -e aws_access_key=${AWS_ACCESS_KEY_ID} \
-              -e aws_secret_key=${AWS_SECRET_ACCESS_KEY}
+              -e rhn_password=${RHN_PASSWORD}
           "
 
       - name: Test ${{ matrix.topology }}
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           BOOTSTRAP: ${{ steps.deploy.outputs.bootstrap_dns }}
         run: |
           ssh -i configure-aws/roles/configure_bootstrap/files/ec2_keypair.pem ec2-user@${BOOTSTRAP} "
-            ansible-playbook -i inventory/test.yml playbooks/test-amq-${{ matrix.topology }}.yml \
-              -e aws_access_key=${AWS_ACCESS_KEY_ID} \
-              -e aws_secret_key=${AWS_SECRET_ACCESS_KEY}
+            ansible-playbook -i inventory/test.yml playbooks/test-amq-${{ matrix.topology }}.yml
           "
 
       - name: Remove ${{ matrix.topology }}
         if: always()
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           BOOTSTRAP: ${{ steps.deploy.outputs.bootstrap_dns }}
         run: |
           ssh -i configure-aws/roles/configure_bootstrap/files/ec2_keypair.pem ec2-user@${BOOTSTRAP} "
-            ansible-playbook -i inventory/all.yml playbooks/remove-amq.yml \
-              -e aws_access_key=${AWS_ACCESS_KEY_ID} \
-              -e aws_secret_key=${AWS_SECRET_ACCESS_KEY}
+            ansible-playbook -i inventory/all.yml playbooks/remove-amq.yml
           "
+
+      - name: Cleanup runner
+        if: always()
+        run: make cleanup

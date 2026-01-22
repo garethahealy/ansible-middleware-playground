@@ -11,5 +11,8 @@
 - name: Copy inventory and playbooks to bootstrap
   ansible.builtin.include_tasks: copy_files.yml
 
+- name: Login to AWS CLI
+  ansible.builtin.include_tasks: aws_cli_login.yml
+
 - name: Print helper SSH command
   ansible.builtin.include_tasks: print.yml

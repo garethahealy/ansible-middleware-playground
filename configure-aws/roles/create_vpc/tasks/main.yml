@@ -1,4 +1,7 @@
 ---
+- name: Get the current caller identity information
+  amazon.aws.aws_caller_info:
+
 - name: Check ami exists
   ansible.builtin.include_tasks: ami_exists.yml
   tags:
