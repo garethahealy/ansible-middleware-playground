@@ -70,7 +70,7 @@ jobs:
           pip3 install -r requirements.txt
 
       - name: Copy ansible.cfg
-        run: cp configure-aws/roles/configure_bootstrap/files/ansible.cfg ~/.ansible.cfg
+        run: cp configure-aws/roles/configure_hosts/files/ansible.cfg ~/.ansible.cfg
 
       - name: Install requirements
         env:
