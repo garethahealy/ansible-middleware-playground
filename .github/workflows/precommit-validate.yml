@@ -15,7 +15,7 @@ jobs:
 
       - uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6
         with:
-          python-version: 3.x
+          python-version: 3.13
 
       - name: Remove rh-pre-commit hook (requires VPN)
         uses: mikefarah/yq@065b200af9851db0d5132f50bc10b1406ea5c0a8 # v4.50.1
