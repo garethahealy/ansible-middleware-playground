@@ -14,3 +14,12 @@
   loop:
     - python3.11
     - python3.11-pip
+    - python3.11-lxml
+
+- name: Install packages via pip
+  ansible.builtin.pip:
+    name: "{{ item }}"
+  loop:
+    - boto3
+    - jmespath
+    - ansible-core==2.18.12
