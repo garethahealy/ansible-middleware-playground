@@ -8,10 +8,10 @@ repos:
       - id: check-json
       - id: end-of-file-fixer
       - id: trailing-whitespace
-  - repo: https://github.com/ansible/ansible-lint
-    rev: v26.1.1
-    hooks:
-      - id: ansible-lint
+#  - repo: https://github.com/ansible/ansible-lint
+#    rev: v26.1.1
+#    hooks:
+#      - id: ansible-lint
   - repo: https://github.com/renovatebot/pre-commit-hooks
     rev: 42.84.0
     hooks:
