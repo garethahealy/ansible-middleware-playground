@@ -3,13 +3,13 @@
   amazon.aws.ec2_instance_info:
     region: "{{ test_amq_region }}"
     filters:
-      instance-state-name: ["running"]
+      instance-state-name: [ "running" ]
       "tag:Name": "amq*"
   register: test_amq_amq_nodes
 
 - name: Create private_dns_names
   ansible.builtin.set_fact:
-    test_amq_private_dns_names: []
+    test_amq_private_dns_names: [ ]
 
 - name: Set AMQ nodes private_dns_names
   ansible.builtin.set_fact:

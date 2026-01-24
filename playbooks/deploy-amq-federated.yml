@@ -6,7 +6,7 @@
     # Clustering
     amq_broker_ha_enabled: true
     amq_broker_cluster_discovery: "provided"
-    amq_broker_cluster_connections: []
+    amq_broker_cluster_connections: [ ]
     # HACK: Allows console
     amq_broker_cors_strict_checking: false
     # Basic config

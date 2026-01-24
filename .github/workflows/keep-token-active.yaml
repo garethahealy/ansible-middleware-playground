@@ -2,7 +2,7 @@ name: "Refresh the ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN token"
 
 on:
   schedule:
-    - cron:  '0 0 1 * *'
+    - cron: '0 0 1 * *'
 
 # Declare default permissions as read only.
 permissions: read-all

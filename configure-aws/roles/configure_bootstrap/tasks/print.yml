@@ -4,7 +4,7 @@
   amazon.aws.ec2_instance_info:
     region: "{{ configure_bootstrap_region }}"
     filters:
-      instance-state-name: ["running"]
+      instance-state-name: [ "running" ]
       "tag:Name": "bootstrap"
   register: configure_bootstrap_ec2_bootstrap_node_info
 

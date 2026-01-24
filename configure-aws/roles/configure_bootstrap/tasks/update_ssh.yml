@@ -4,13 +4,13 @@
   amazon.aws.ec2_instance_info:
     region: "{{ configure_bootstrap_region }}"
     filters:
-      instance-state-name: ["running"]
+      instance-state-name: [ "running" ]
       "tag:Name": "amq*"
   register: configure_bootstrap_ec2_node_info
 
 - name: Create empty private_dns_names collection
   ansible.builtin.set_fact:
-    configure_bootstrap_private_dns_names: []
+    configure_bootstrap_private_dns_names: [ ]
 
 - name: Add DNS names to private_dns_names collection
   ansible.builtin.set_fact:

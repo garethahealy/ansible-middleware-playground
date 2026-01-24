@@ -3,7 +3,7 @@
   amazon.aws.ec2_instance_info:
     region: "{{ create_vpc_region }}"
     filters:
-      instance-state-name: ["running"]
+      instance-state-name: [ "running" ]
       "tag:Name": "bootstrap"
   register: create_vpc_bootstrap_node
 
@@ -17,13 +17,13 @@
   amazon.aws.ec2_instance_info:
     region: "{{ create_vpc_region }}"
     filters:
-      instance-state-name: ["running"]
+      instance-state-name: [ "running" ]
       "tag:Name": "amq*"
   register: create_vpc_amq_nodes
 
 - name: Create private_dns_names
   ansible.builtin.set_fact:
-    create_vpc_private_dns_names_unsorted: []
+    create_vpc_private_dns_names_unsorted: [ ]
 
 - name: Set AMQ nodes private_dns_names
   ansible.builtin.set_fact:
@@ -37,7 +37,7 @@
 
 - name: Create public_dns_names
   ansible.builtin.set_fact:
-    create_vpc_public_dns_names_unsorted: []
+    create_vpc_public_dns_names_unsorted: [ ]
 
 - name: Set AMQ nodes private_dns_names
   ansible.builtin.set_fact:
