@@ -2,6 +2,14 @@
 
 Examples using https://github.com/ansible-middleware/amq
 
+## Local Setup
+
+```bash
+uv venv --python 3.11
+source .venv/bin/activate
+uv pip install -r requirements.txt
+```
+
 ## Setup
 
 If you don't have any infrastructure, see [README.md](configure-aws%2FREADME.md). If you do, create an inventory file
