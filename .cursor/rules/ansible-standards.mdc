@@ -1,0 +1,11 @@
+---
+description: Ansible coding standards and best practices
+globs: "**/*.yml,**/*.yaml,**/*.j2"
+alwaysApply: true
+---
+
+# Ansible Standards
+
+- Write clean, efficient, and well-documented Ansible code with accurate examples.
+- Use best practices and conventions throughout your code.
+- Validate all playbooks with `ansible-lint` before running.

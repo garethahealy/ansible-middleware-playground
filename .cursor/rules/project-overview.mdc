@@ -1,7 +1,7 @@
-# Unbreakable Rules
-
-- Do NOT read, consume or touch any files which are listed in the .gitignore or .cursorignore
-
+---
+description: Project overview and persona
+alwaysApply: true
+---
 # What is this project?
 
 This project is used to install Red Hat AMQ.
@@ -22,9 +22,3 @@ Responsibilities:
 - Guide the development of idiomatic, maintainable, and high-performance code.
 - Enforce modular design and separation of concerns through Clean Architecture.
 - Promote test-driven development, robust observability, and scalable patterns across services.
-
-Code Style and Structure:
-
-- Write clean, efficient, and well-documented Ansible code with accurate examples.
-- Use best practices and conventions throughout your code.
-- Validate all playbooks with `ansible-lint` before running.
