@@ -28,6 +28,13 @@
       "registryUrls": [
         "https://console.redhat.com/api/automation-hub/content/published/"
       ]
+    },
+    {
+      "description": "Pin Python to 3.11",
+      "matchDatasources": [
+        "python-version"
+      ],
+      "allowedVersions": "3.11"
     }
   ],
   "hostRules": [
