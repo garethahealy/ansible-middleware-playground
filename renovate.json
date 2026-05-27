@@ -30,11 +30,14 @@
       ]
     },
     {
-      "description": "Pin Python to 3.11",
-      "matchDatasources": [
-        "python-version"
+      "description": "Pin Python to 3.11 in GitHub Actions",
+      "matchManagers": [
+        "github-actions"
       ],
-      "allowedVersions": "3.11"
+      "matchDepNames": [
+        "python"
+      ],
+      "allowedVersions": "<3.12"
     }
   ],
   "hostRules": [
