@@ -25,9 +25,10 @@
       ]
     },
     {
-      "description": "Pin Python to 3.11 in GitHub Actions",
+      "description": "Pin Python to 3.11 in GitHub Actions and .python-version",
       "matchManagers": [
-        "github-actions"
+        "github-actions",
+        "pyenv"
       ],
       "matchDepNames": [
         "python"
