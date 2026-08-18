@@ -8,6 +8,8 @@ Examples using https://github.com/ansible-middleware/amq
 uv venv --python 3.11
 source .venv/bin/activate
 uv pip install -r requirements.txt
+
+export ANSIBLE_CONFIG=configure-aws/roles/configure_hosts/files/ansible.cfg
 ```
 
 ## Setup
