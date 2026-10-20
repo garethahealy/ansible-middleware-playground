@@ -112,3 +112,7 @@ ansible-playbook -i inventory/test.yml playbooks/test-amq-federated.yml
 ```bash
 ansible-playbook -i inventory/all.yml playbooks/remove-amq.yml
 ```
+
+## Renovate and Automation Hub
+
+See: https://github.com/renovatebot/renovate/discussions/31854
