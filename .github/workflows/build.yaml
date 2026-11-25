@@ -35,7 +35,7 @@ jobs:
         run: ansible-galaxy install -r requirements.yml
 
       - name: Run ansible-lint
-        uses: ansible/ansible-lint@fac2489f3e4ccffa83a40b839770abbf4ab52327 # v26.10.0
+        uses: ansible/ansible-lint@b5609548ec49df35aabb89b6cb71de8f398cd195 # v26.11.1
 
       - name: Tar and Generate hashes
         shell: bash
